@@ -51,9 +51,10 @@
       padding: 22px;
       box-shadow: var(--shadow);
     }
-    .brand-row { display:flex; align-items:center; gap:16px; }
-    .brand-icon { width:76px; height:76px; border-radius:20px; box-shadow:0 12px 30px rgba(0,0,0,.35); flex:0 0 auto; }
+    .brand-row { display:flex; align-items:center; gap:14px; }
+    .brand-icon { width:68px; height:68px; border-radius:18px; box-shadow:0 12px 30px rgba(0,0,0,.35); flex:0 0 auto; }
     .hero-copy { min-width:0; flex:1; }
+    .hero-copy h1 { white-space:nowrap; }
     .install-btn { background:#e5e7eb; color:#07120c; white-space:nowrap; }
     .hero h1 {
       margin: 0;
@@ -248,8 +249,11 @@
       body { padding: 12px; }
       .hero, .card { padding: 16px; }
       .payment-grid { grid-template-columns: 1fr; }
-      .brand-row { align-items:flex-start; flex-wrap:wrap; }
-      .brand-icon { width:64px; height:64px; border-radius:17px; }
+      .hero { padding:12px 14px; border-radius:20px; }
+      .brand-row { align-items:center; flex-wrap:nowrap; gap:10px; }
+      .brand-icon { width:52px; height:52px; border-radius:14px; }
+      .hero-copy h1 { font-size:clamp(1.35rem,6vw,1.8rem); white-space:nowrap; }
+      .install-btn { padding:10px 12px; font-size:.82rem; border-radius:11px; }
     }
   </style>
 </head>
@@ -260,8 +264,6 @@
         <img class="brand-icon" src="icon-192.png" alt="Voice to Pocket mouth, sound and dollar sign logo" />
         <div class="hero-copy">
           <h1>Voice to Pocket</h1>
-          <div class="tagline">Speak the order. Price it. Pay like you weigh.</div>
-          <p>Seymore Green's voice-powered pocket register for apparel orders, instant quotes, payments, restock reminders, and hot-item ideas.</p>
         </div>
         <button id="installBtn" class="install-btn" type="button" hidden>Install App</button>
       </div>
@@ -269,8 +271,7 @@
 
     <section class="layout">
       <div class="card">
-        <h2>New Voice Entry</h2>
-        <p class="muted">Use this for apparel jobs, restock reminders, or hot item ideas. Speak the basics out loud and the app will try to sort the lane and bucket automatically.</p>
+        <h2>Speak Your Order</h2>
 
         <div class="controls">
           <button id="micBtn" class="mic-btn">🎤 Start Voice Capture</button>

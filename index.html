@@ -1,1144 +1,761 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Voice to Pocket | SG</title>
-  <meta name="description" content="Voice-powered apparel quoting and payment tool by Seymore Green." />
-  <meta name="theme-color" content="#07120c" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Voice to Pocket" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --panel-2: #1f2937;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #22c55e;
-      --danger: #ef4444;
-      --border: rgba(255,255,255,0.1);
-      --shadow: 0 20px 40px rgba(0,0,0,0.25);
-      --radius: 20px;
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(160deg, #06111f 0%, #0f172a 50%, #111827 100%);
-      color: var(--text);
-      min-height: 100%;
-    }
-    body { padding: 18px; }
-    .app {
-      width: min(1180px, 100%);
-      margin: 0 auto;
-      display: grid;
-      gap: 18px;
-    }
-    .hero {
-      background: linear-gradient(140deg, rgba(34,197,94,0.2), rgba(15,23,42,0.9));
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-    }
-    .brand-row { display:flex; align-items:center; gap:14px; }
-    .brand-icon { width:68px; height:68px; border-radius:18px; box-shadow:0 12px 30px rgba(0,0,0,.35); flex:0 0 auto; }
-    .hero-copy { min-width:0; flex:1; }
-    .hero-copy h1 { white-space:nowrap; }
-    .install-btn { background:#e5e7eb; color:#07120c; white-space:nowrap; }
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      letter-spacing: 0.02em;
-    }
-    .hero p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    .tagline {
-      margin-top: 10px;
-      display: inline-block;
-      background: rgba(34,197,94,0.16);
-      color: #bbf7d0;
-      border: 1px solid rgba(34,197,94,0.35);
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 0.95rem;
-      font-weight: 700;
-    }
-    .layout {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
-    }
-    .card {
-      background: rgba(17,24,39,0.9);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-    .card h2, .card h3 { margin: 0 0 10px; }
-    .muted { color: var(--muted); }
-    .small { font-size: 0.85rem; }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    button {
-      appearance: none;
-      border: none;
-      border-radius: 14px;
-      padding: 14px 18px;
-      font-size: 0.98rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    button:hover { transform: translateY(-1px); }
-    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .mic-btn { background: var(--accent); color: #052e16; min-width: 190px; }
-    .mic-btn.listening { background: var(--danger); color: white; animation: pulse 1.2s infinite; }
-    .secondary { background: #334155; color: white; }
-    .ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-    .money {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #03170a;
-      width: 100%;
-      font-size: 1.05rem;
-      padding: 16px 18px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .grid-1 { grid-column: 1 / -1; }
-    label {
-      display: block;
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-      color: #cbd5e1;
-      font-weight: 700;
-    }
-    input, select, textarea {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      color: white;
-      padding: 12px 13px;
-      font-size: 0.96rem;
-      outline: none;
-    }
-    textarea { min-height: 110px; resize: vertical; }
-    input::placeholder, textarea::placeholder { color: #94a3b8; }
-    .status {
-      margin-top: 10px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: rgba(34,197,94,0.12);
-      border: 1px solid rgba(34,197,94,0.24);
-      color: #bbf7d0;
-      display: none;
-    }
-    .status.show { display: block; }
-    .status.warn {
-      background: rgba(245,158,11,0.12);
-      border-color: rgba(245,158,11,0.24);
-      color: #fde68a;
-    }
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0 0;
-    }
-    .pill {
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.05);
-      color: #e2e8f0;
-    }
-    .pill.active {
-      background: rgba(34,197,94,0.16);
-      border-color: rgba(34,197,94,0.35);
-      color: #bbf7d0;
-    }
-    .orders-list {
-      display: grid;
-      gap: 10px;
-      max-height: 760px;
-      overflow: auto;
-      padding-right: 2px;
-    }
-    .order-item {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-      border-radius: 16px;
-      padding: 14px;
-    }
-    .order-item h4 { margin: 0 0 6px; font-size: 1rem; }
-    .order-item p {
-      margin: 6px 0;
-      color: #cbd5e1;
-      line-height: 1.4;
-      font-size: 0.92rem;
-    }
-    .order-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .order-meta span {
-      font-size: 0.8rem;
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #cbd5e1;
-    }
-    .footer-note {
-      font-size: 0.84rem;
-      line-height: 1.5;
-      color: var(--muted);
-      margin-top: 8px;
-    }
-    .quote-box { grid-column:1/-1; background:linear-gradient(135deg,#052e16,#07140c); border:1px solid rgba(34,197,94,.55); border-radius:18px; padding:18px; box-shadow:0 18px 45px rgba(0,0,0,.22); }
-    .quote-title { font-weight:900; color:#86efac; text-transform:uppercase; letter-spacing:.08em; }
-    .quote-lines { margin-top:12px; display:grid; gap:7px; }
-    .quote-line { display:flex; justify-content:space-between; gap:16px; color:#d1fae5; }
-    .quote-line.total { margin-top:8px; padding-top:12px; border-top:1px solid rgba(134,239,172,.35); font-size:1.35rem; font-weight:900; color:white; }
-    .quote-warning { margin-top:10px; color:#fde68a; font-weight:800; }
-    .payment-panel { grid-column:1/-1; border:1px solid var(--border); border-radius:16px; padding:16px; background:#0b1220; }
-    .payment-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
-    .pay-link { display:block; text-align:center; padding:14px 10px; border-radius:12px; text-decoration:none; color:white; font-weight:900; background:#166534; }
-    .pay-link.paypal { background:#075985; }
-    .pay-link.cashapp { background:#15803d; }
-    .pay-link.disabled { opacity:.4; pointer-events:none; }
-    .payment-help { color:var(--muted); font-size:.85rem; margin-top:10px; line-height:1.45; }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
-      70% { box-shadow: 0 0 0 16px rgba(239,68,68,0); }
-      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-    }
-    @media (max-width: 880px) {
-      .layout { grid-template-columns: 1fr; }
-      .grid { grid-template-columns: 1fr; }
-      body { padding: 12px; }
-      .hero, .card { padding: 16px; }
-      .payment-grid { grid-template-columns: 1fr; }
-      .hero { padding:12px 14px; border-radius:20px; }
-      .brand-row { align-items:center; flex-wrap:nowrap; gap:10px; }
-      .brand-icon { width:52px; height:52px; border-radius:14px; }
-      .hero-copy h1 { font-size:clamp(1.35rem,6vw,1.8rem); white-space:nowrap; }
-      .install-btn { padding:10px 12px; font-size:.82rem; border-radius:11px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Voice to Pocket — Seymore Green</title>
+<meta name="description" content="Voice-powered order intake, instant pricing, payments, and order tracking for Seymore Green." />
+<meta name="theme-color" content="#0f0f0f" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Voice to Pocket" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#4BBB2A;--green-dark:#2d8a17;--dark:#0f0f0f;--panel:#1a1a1a;
+  --panel-2:#242424;--line:#2e2e2e;--text:#f2f2f2;--muted:#8a8a8a;
+  --amber:#ffb347;--red:#ff4d4d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--dark);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;-webkit-text-size-adjust:100%}
+body{
+  background:radial-gradient(circle at 15% 0%,rgba(75,187,42,.12),transparent 45%),
+             radial-gradient(circle at 90% 100%,rgba(75,187,42,.08),transparent 40%),var(--dark);
+  padding:16px 14px 80px;
+}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* HEADER */
+.hero{border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#141414 0%,#1c1c1c 100%);
+  padding:20px 16px 20px 16px;position:relative;overflow:hidden;margin-bottom:16px;}
+.hero::before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(75,187,42,.35),transparent 70%);filter:blur(30px);}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:8px;position:relative;}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,8vw,50px);line-height:.95;letter-spacing:-.02em;margin-bottom:8px;position:relative;}
+h1 .accent{color:var(--green)}
+.tagline{color:var(--muted);font-size:13px;line-height:1.5;position:relative;max-width:460px}
+.brand-stripe{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;position:relative;}
+.chip{border:1px solid var(--line);background:rgba(0,0,0,.3);padding:5px 11px;border-radius:999px;font-size:11px;color:#ccc;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;}
+.chip.on{border-color:var(--green);color:var(--green)}
+.gear-btn{position:absolute;top:16px;right:16px;width:48px;height:48px;background:rgba(75,187,42,.15);color:var(--green);
+  border:1px solid var(--green);border-radius:10px;font-size:18px;cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;z-index:5;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.gear-btn:active{background:var(--green);color:#000;transform:scale(.95)}
+
+/* LAYOUT */
+.grid{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:780px){.grid{grid-template-columns:1.1fr .9fr;gap:20px}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
+.panel h2{font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:-.01em;margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.panel h2 .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0;}
+.panel .sub{color:var(--muted);font-size:12px;margin-bottom:14px;line-height:1.5}
+
+/* MIC */
+.mic-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px;background:var(--panel-2);border-radius:14px;border:1px dashed #333;}
+.mic-btn{width:100px;height:100px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--green) 0%,var(--green-dark) 100%);
+  color:#000;font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:.5px;
+  box-shadow:0 12px 30px rgba(75,187,42,.35),inset 0 2px 0 rgba(255,255,255,.35);
+  transition:transform .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.mic-btn:active{transform:scale(.95)}
+.mic-btn.listening{background:linear-gradient(135deg,var(--red) 0%,#b22 100%);animation:pulse 1.2s ease-in-out infinite;color:#fff;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,77,77,.6),0 12px 30px rgba(255,77,77,.4)}50%{box-shadow:0 0 0 18px rgba(255,77,77,0),0 12px 30px rgba(255,77,77,.4)}}
+.transcript{width:100%;min-height:52px;background:#000;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green);line-height:1.5;word-break:break-word;}
+.transcript.empty{color:#555}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:460px){.form-grid{grid-template-columns:1fr 1fr}}
+label.lbl{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
+input,select,textarea{width:100%;background:#000;border:1px solid var(--line);color:var(--text);padding:13px 14px;border-radius:10px;font-family:inherit;font-size:16px;-webkit-appearance:none;appearance:none;touch-action:manipulation;transition:border .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green)}
+textarea{resize:vertical;min-height:70px;font-size:15px}
+select{background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 12px center;background-size:20px;padding-right:40px;}
+
+/* SIZE PICKER — PLUS / MINUS, NO RIGHT-CLICK */
+#sizesWrap{margin-top:16px}
+.size-row-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.size-hint{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.size-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
+.size-row{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#000;border:1px solid var(--line);border-radius:10px;padding:6px 8px;transition:border-color .15s;}
+.size-row.has-count{border-color:var(--green);background:rgba(75,187,42,.07)}
+.size-name{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;font-weight:600;flex:1;text-align:center;}
+.size-row.has-count .size-name{color:var(--green)}
+.size-controls{display:flex;align-items:center;gap:3px;}
+.sz-btn{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:#1a1a1a;cursor:pointer;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:all .12s;flex-shrink:0;line-height:1;}
+.sz-btn:active{transform:scale(.9);background:rgba(75,187,42,.12);border-color:var(--green);}
+.sz-btn.minus{color:#666;}
+.sz-btn.plus{color:var(--green);}
+.sz-count{min-width:26px;text-align:center;font-family:'Archivo Black',sans-serif;font-size:15px;color:var(--green);}
+.sz-count.zero{color:#333}
+
+/* PRICE BOX */
+.price-box{background:linear-gradient(135deg,#0a1f06 0%,#112a0a 100%);border:1px solid rgba(75,187,42,.4);border-radius:14px;padding:16px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;}
+.price-box .label-sm{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+.price-box .value{font-family:'Archivo Black',sans-serif;font-size:22px;color:var(--green);margin-top:3px;}
+.price-box .value.total{font-size:30px;color:#fff;text-shadow:0 0 10px rgba(75,187,42,.5)}
+.rush-flag{background:var(--amber);color:#000;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:1px;display:inline-block;margin-top:6px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+.rush-flag.hidden{display:none}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.btn{padding:0 18px;height:50px;border-radius:10px;border:none;cursor:pointer;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.5px;text-transform:uppercase;transition:all .12s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;min-width:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--green);color:#000;box-shadow:0 6px 16px rgba(75,187,42,.3)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+.btn-ghost:active{border-color:var(--green);color:var(--green)}
+
+/* PAYMENT */
+.pay-row{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px;}
+@media(min-width:380px){.pay-row{grid-template-columns:repeat(3,1fr)}}
+.pay-btn{height:58px;border-radius:12px;font-family:'Archivo Black',sans-serif;font-size:13px;text-align:center;cursor:pointer;border:none;color:#fff;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;letter-spacing:.5px;transition:transform .12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.pay-btn:active{transform:scale(.97)}
+.pay-venmo{background:#3d95ce}.pay-paypal{background:#0070ba}.pay-cashapp{background:#00d632;color:#000}
+.pay-btn small{display:block;font-family:'JetBrains Mono',monospace;font-weight:400;font-size:10px;opacity:.85;margin-top:2px;letter-spacing:.5px;}
+
+/* ORDER CARDS (mobile) */
+.orders-cards{display:flex;flex-direction:column;gap:10px;}
+@media(min-width:600px){.orders-cards{display:none}}
+.order-card{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px;}
+.order-card.is-paid{border-color:rgba(75,187,42,.4)}
+.ocard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.ocard-name{font-family:'Archivo Black',sans-serif;font-size:15px;}
+.ocard-total{font-family:'Archivo Black',sans-serif;font-size:18px;color:var(--green);}
+.ocard-meta{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.9;}
+.ocard-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+
+/* ORDER TABLE (desktop) */
+.orders-table-wrap{display:none;overflow-x:auto;}
+@media(min-width:600px){.orders-table-wrap{display:block}}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);background:#111;}
+tr:hover{background:rgba(75,187,42,.04)}
+
+.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.5px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+.badge.paid{background:rgba(75,187,42,.18);color:var(--green);border:1px solid rgba(75,187,42,.4)}
+.badge.unpaid{background:rgba(255,77,77,.15);color:var(--red);border:1px solid rgba(255,77,77,.4)}
+.badge.deposit{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid rgba(255,179,71,.3)}
+.badge.rush{background:rgba(255,179,71,.15);color:var(--amber);border:1px solid rgba(255,179,71,.4)}
+
+.icon-btn{height:40px;padding:0 14px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;}
+.icon-btn:active{border-color:var(--green);color:var(--green)}
+.icon-btn.danger:active{border-color:var(--red);color:var(--red)}
+.empty-state{text-align:center;padding:32px;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;}
+
+/* SETTINGS MODAL */
+.settings-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+@media(min-width:460px){.settings-grid{grid-template-columns:1fr 1fr 1fr}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:20px 14px 60px;overflow-y:auto;backdrop-filter:blur(4px);}
+.modal-overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--green);border-radius:18px;padding:22px;max-width:580px;width:100%;margin:auto;}
+.modal h3{font-family:'Archivo Black',sans-serif;font-size:20px;margin-bottom:4px;}
+.modal .sub{color:var(--muted);font-size:12px;margin-bottom:16px;line-height:1.5}
+.modal-section{padding:14px 0;border-top:1px solid var(--line);}
+.modal-section:first-of-type{border-top:none;padding-top:0}
+.modal-section h4{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:10px;}
+.modal-close-row{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+.sync-status{display:inline-block;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:6px;}
+.sync-status.ok{background:rgba(75,187,42,.15);color:var(--green)}
+.sync-status.err{background:rgba(255,77,77,.15);color:var(--red)}
+.sync-status.idle{background:#1e1e1e;color:var(--muted)}
+
+/* TOAST — centered at bottom */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--green);color:#000;padding:12px 22px;border-radius:10px;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.5px;transition:transform .3s ease;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red);color:#fff}
+
+.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+details summary{cursor:pointer;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:10px 0;-webkit-tap-highlight-color:transparent;user-select:none;}
+</style>
 </head>
 <body>
-  <div class="app">
-    <section class="hero">
-      <div class="brand-row">
-        <img class="brand-icon" src="icon-192.png" alt="Voice to Pocket mouth, sound and dollar sign logo" />
-        <div class="hero-copy">
-          <h1>Voice to Pocket</h1>
-        </div>
-        <button id="installBtn" class="install-btn" type="button" hidden>Install App</button>
-      </div>
-    </section>
+<div class="wrap">
 
-    <section class="layout">
-      <div class="card">
-        <h2>Speak Your Order</h2>
-
-        <div class="controls">
-          <button id="micBtn" class="mic-btn">🎤 Start Voice Capture</button>
-          <button id="clearBtn" class="secondary" type="button">Clear Form</button>
-          <button id="exportBtn" class="ghost" type="button">Export CSV</button>
-        </div>
-
-        <div id="voiceStatus" class="status warn show">Voice capture uses the browser speech feature. It works best in Chrome on Android and desktop. If your browser does not support it, you can still type manually.</div>
-
-        <div class="grid" style="margin-top: 14px;">
-          <div class="grid-1">
-            <label for="transcript">Voice Transcript</label>
-            <textarea id="transcript" placeholder="Example: Need to reorder two boxes of pre-rolls and gummies by Thursday. Or: John needs one black XL tee front print only due Friday. Or: Hot design of the week, make the Boston Marathon Kenya shirt."></textarea>
-          </div>
-
-          <div>
-            <label for="entryType">Entry Type</label>
-            <select id="entryType">
-              <option value="Apparel Order">Apparel Order</option>
-              <option value="Hemp Restock">Hemp Restock</option>
-              <option value="Hot Item Reminder">Hot Item Reminder</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="bucket">Bucket</label>
-            <select id="bucket">
-              <option value="One T">One T</option>
-              <option value="Custom T-Shirt 6+">Custom T-Shirt 6+</option>
-              <option value="Custom More Apparel">Custom More Apparel</option>
-              <option value="Custom Anything">Custom Anything</option>
-              <option value="Hemp Restock">Hemp Restock</option>
-              <option value="Hot Item of the Week">Hot Item of the Week</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="orderStatus">Status</label>
-            <select id="orderStatus">
-              <option value="New">New</option>
-              <option value="Needs Follow-Up">Needs Follow-Up</option>
-              <option value="Quoted">Quoted</option>
-              <option value="Rush">Rush</option>
-              <option value="Need to Order">Need to Order</option>
-              <option value="Idea">Idea</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="customerName">Customer / Vendor / Reminder Name</label>
-            <input id="customerName" type="text" placeholder="John Smith or Vendor Name" />
-          </div>
-
-          <div>
-            <label for="phone">Phone</label>
-            <input id="phone" type="text" placeholder="617-555-1111" />
-          </div>
-
-          <div>
-            <label for="email">Email</label>
-            <input id="email" type="email" placeholder="customer@email.com" />
-          </div>
-
-          <div>
-            <label for="dueDate">Due Date / Reminder Date</label>
-            <input id="dueDate" type="datetime-local" />
-          </div>
-
-          <div>
-            <label for="pricingMode">Pricing Lane</label>
-            <select id="pricingMode">
-              <option value="personal">Personal</option>
-              <option value="business_full">Business Full-Color</option>
-              <option value="business_one">Business One-Color Staff Package</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="garmentType">Apparel Type</label>
-            <select id="garmentType">
-              <option value="T-Shirt">T-Shirt</option>
-              <option value="Hoodie">Hoodie</option>
-              <option value="Sweatshirt">Sweatshirt</option>
-              <option value="Hat">Hat</option>
-              <option value="Mixed Apparel">Mixed Apparel</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="quantity">Quantity</label>
-            <input id="quantity" type="number" min="1" placeholder="1" />
-          </div>
-
-          <div>
-            <label for="printType">Print Type</label>
-            <select id="printType">
-              <option value="full">Full Color</option>
-              <option value="white">White Print</option>
-              <option value="one">One Print Color</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="inventoryType">Inventory / Reminder Type</label>
-            <select id="inventoryType">
-              <option value="">Select if needed</option>
-              <option value="Pre-Rolls">Pre-Rolls</option>
-              <option value="Disposables">Disposables</option>
-              <option value="Flower">Flower</option>
-              <option value="Edibles / Gummies">Edibles / Gummies</option>
-              <option value="CBD Lotion">CBD Lotion</option>
-              <option value="Hot T-Shirt Design">Hot T-Shirt Design</option>
-              <option value="Hot Product of the Week">Hot Product of the Week</option>
-              <option value="General Reminder">General Reminder</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="color">Color / Flavor / Strain</label>
-            <input id="color" type="text" placeholder="Black, Sour Diesel, Lemon..." />
-          </div>
-
-          <div>
-            <label for="sizes">Sizes / Pack Size</label>
-            <input id="sizes" type="text" placeholder="XL or 2M, 2L, box of 25..." />
-          </div>
-
-          <div>
-            <label for="printLocations">Print Location(s)</label>
-            <select id="printLocations">
-              <option value="Front Only">Front Only</option>
-              <option value="Left Chest">Left Chest</option>
-              <option value="Front and Back">Front and Back</option>
-              <option value="Back Only">Back Only</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="qty2xl">How Many 2XL?</label>
-            <input id="qty2xl" type="number" min="0" value="0" />
-          </div>
-
-          <div>
-            <label for="qty3xl">How Many 3XL?</label>
-            <input id="qty3xl" type="number" min="0" value="0" />
-          </div>
-
-          <div>
-            <label for="qty4plus">How Many 4XL–5XL?</label>
-            <input id="qty4plus" type="number" min="0" value="0" />
-          </div>
-
-          <div>
-            <label for="turnaround">Turnaround</label>
-            <select id="turnaround">
-              <option value="standard">Standard</option>
-              <option value="rush">Rush +25%</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="taxMode">Massachusetts Sales Tax</label>
-            <select id="taxMode">
-              <option value="taxable">Apply 6.25%</option>
-              <option value="exempt">Tax Exempt</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="payStatus">Payment Status</label>
-            <select id="payStatus">
-              <option value="Unpaid">Unpaid</option>
-              <option value="Paid">Paid</option>
-              <option value="Deposit Taken">Deposit Taken</option>
-            </select>
-          </div>
-
-          <div class="grid-1">
-            <label for="notes">Notes</label>
-            <textarea id="notes" placeholder="Special instructions, reorder details, hot item notes, quote notes, pickup notes, or anything else."></textarea>
-          </div>
-
-          <div class="quote-box" id="quoteBox">
-            <div class="quote-title">Live Voice to Pocket Quote</div>
-            <div class="quote-lines">
-              <div class="quote-line"><span>Merchandise</span><strong id="quoteSubtotal">$0.00</strong></div>
-              <div class="quote-line"><span>Rush</span><strong id="quoteRush">$0.00</strong></div>
-              <div class="quote-line"><span>MA Tax</span><strong id="quoteTax">$0.00</strong></div>
-              <div class="quote-line total"><span>Total Due</span><strong id="quoteTotal">$0.00</strong></div>
-            </div>
-            <div class="quote-warning" id="quoteWarning">Enter an apparel quantity to calculate the quote.</div>
-          </div>
-
-          <div class="payment-panel">
-            <strong>Pay Now</strong>
-            <div class="payment-grid">
-              <a id="venmoPay" class="pay-link disabled" target="_blank" rel="noopener">VENMO</a>
-              <a id="paypalPay" class="pay-link paypal disabled" target="_blank" rel="noopener">PAYPAL</a>
-              <a id="cashAppPay" class="pay-link cashapp disabled" target="_blank" rel="noopener">CASH APP</a>
-            </div>
-            <div class="payment-help">Venmo @seymore-green • PayPal sales@seymoregreen.com • Cash App $iseymoregreen. Opening a payment link does not mark the order paid—confirm receipt, then change Payment Status to Paid.</div>
-          </div>
-        </div>
-
-        <div class="pill-row" id="bucketPills">
-          <span class="pill active" data-bucket-pill="One T">One T</span>
-          <span class="pill" data-bucket-pill="Custom T-Shirt 6+">Custom T-Shirt 6+</span>
-          <span class="pill" data-bucket-pill="Custom More Apparel">Custom More Apparel</span>
-          <span class="pill" data-bucket-pill="Custom Anything">Custom Anything</span>
-          <span class="pill" data-bucket-pill="Hemp Restock">Hemp Restock</span>
-          <span class="pill" data-bucket-pill="Hot Item of the Week">Hot Item of the Week</span>
-        </div>
-
-        <div class="controls" style="margin-top: 16px;">
-          <button id="saveBtn" class="money" type="button">Speak it. Save it. Sell it.</button>
-        </div>
-        <div class="controls">
-          <button id="calendarBtn" class="secondary" type="button">Save + Open Google Calendar</button>
-        </div>
-
-        <div class="footer-note">
-          Static Netlify version: entries are stored in your browser on that device. Export CSV anytime for backup. Google Calendar opens as a prefilled event so you can save it in one tap.
-        </div>
-        <div id="saveStatus" class="status"></div>
-      </div>
-
-      <div class="card">
-        <h3>Saved Entries</h3>
-        <p class="muted small">Newest entries appear first. Apparel orders, restock reminders, and hot-item prompts all live in one clean board.</p>
-        <div class="orders-list" id="ordersList"></div>
-      </div>
-    </section>
+  <div class="hero">
+    <div class="eyebrow">Seymore Green • Order Intake System</div>
+    <h1>Voice to <span class="accent">Pocket.</span></h1>
+    <p class="tagline">Speak the order. Size it. Price it. Collect the money.<br>Why lift a finger when we have technology at our fingertips.</p>
+    <div class="brand-stripe">
+      <span class="chip on" id="chipMic">● Mic Ready</span>
+      <span class="chip" id="chipOrders">0 Orders Logged</span>
+      <span class="chip" id="chipSync">● Sheets Off</span>
+      <span class="chip">19 Years Deep</span>
+    </div>
+    <button class="gear-btn" id="openSettings" title="Settings">⚙</button>
   </div>
 
-  <script>
-    const storageKey = 'sgVoiceOrderPlus';
-    const fields = {
-      transcript: document.getElementById('transcript'),
-      entryType: document.getElementById('entryType'),
-      bucket: document.getElementById('bucket'),
-      orderStatus: document.getElementById('orderStatus'),
-      customerName: document.getElementById('customerName'),
-      phone: document.getElementById('phone'),
-      email: document.getElementById('email'),
-      dueDate: document.getElementById('dueDate'),
-      pricingMode: document.getElementById('pricingMode'),
-      garmentType: document.getElementById('garmentType'),
-      quantity: document.getElementById('quantity'),
-      printType: document.getElementById('printType'),
-      inventoryType: document.getElementById('inventoryType'),
-      color: document.getElementById('color'),
-      sizes: document.getElementById('sizes'),
-      printLocations: document.getElementById('printLocations'),
-      qty2xl: document.getElementById('qty2xl'),
-      qty3xl: document.getElementById('qty3xl'),
-      qty4plus: document.getElementById('qty4plus'),
-      turnaround: document.getElementById('turnaround'),
-      taxMode: document.getElementById('taxMode'),
-      payStatus: document.getElementById('payStatus'),
-      notes: document.getElementById('notes')
-    };
+  <div class="grid">
 
-    const micBtn = document.getElementById('micBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const exportBtn = document.getElementById('exportBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const calendarBtn = document.getElementById('calendarBtn');
-    const ordersList = document.getElementById('ordersList');
-    const saveStatus = document.getElementById('saveStatus');
-    const voiceStatus = document.getElementById('voiceStatus');
-    const quoteSubtotal = document.getElementById('quoteSubtotal');
-    const quoteRush = document.getElementById('quoteRush');
-    const quoteTax = document.getElementById('quoteTax');
-    const quoteTotal = document.getElementById('quoteTotal');
-    const quoteWarning = document.getElementById('quoteWarning');
-    const venmoPay = document.getElementById('venmoPay');
-    const paypalPay = document.getElementById('paypalPay');
-    const cashAppPay = document.getElementById('cashAppPay');
-
-    const PRICEBOOK = {
-      personal: { tshirtWhite:26.99, tshirtFull:29.99, hoodie:49.99, sweatshirt:37.99 },
-      businessTee: [
-        {min:6,max:9,price:25}, {min:10,max:24,price:22}, {min:25,max:49,price:20},
-        {min:50,max:99,price:18}, {min:100,max:Infinity,price:16}
-      ],
-      staff: {12:300,24:480,36:648},
-      size: {twoXL:3,threeXL:4},
-      extraLocationPerShirt:5,
-      rushRate:.25,
-      taxRate:.0625
-    };
-
-    const PAYMENT = {
-      venmo:'seymore-green',
-      paypalMe:'seymoregreen',
-      paypalDisplay:'sales@seymoregreen.com',
-      cashApp:'iseymoregreen'
-    };
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    let listening = false;
-
-    function setStatus(message, type = 'success') {
-      saveStatus.textContent = message;
-      saveStatus.className = 'status show' + (type === 'warn' ? ' warn' : '');
-      window.clearTimeout(setStatus._timer);
-      setStatus._timer = window.setTimeout(() => {
-        saveStatus.className = 'status';
-      }, 3500);
-    }
-
-    function getEntries() {
-      try {
-        return JSON.parse(localStorage.getItem(storageKey)) || [];
-      } catch {
-        return [];
-      }
-    }
-
-    function setEntries(entries) {
-      localStorage.setItem(storageKey, JSON.stringify(entries));
-    }
-
-    function formatDateForDisplay(value) {
-      if (!value) return 'No date set';
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return value;
-      return date.toLocaleString();
-    }
-
-    function formatDateForGoogleCalendar(value) {
-      if (!value) return null;
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return null;
-      const end = new Date(date.getTime() + 30 * 60 * 1000);
-      const format = (d) => {
-        const yyyy = d.getUTCFullYear();
-        const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-        const dd = String(d.getUTCDate()).padStart(2, '0');
-        const hh = String(d.getUTCHours()).padStart(2, '0');
-        const mi = String(d.getUTCMinutes()).padStart(2, '0');
-        const ss = String(d.getUTCSeconds()).padStart(2, '0');
-        return `${yyyy}${mm}${dd}T${hh}${mi}${ss}Z`;
-      };
-      return `${format(date)}/${format(end)}`;
-    }
-
-    function escapeHtml(text) {
-      return String(text || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function updateBucketPills(bucket) {
-      document.querySelectorAll('[data-bucket-pill]').forEach((pill) => {
-        pill.classList.toggle('active', pill.getAttribute('data-bucket-pill') === bucket);
-      });
-    }
-
-    function money(value) { return `$${Number(value || 0).toFixed(2)}`; }
-
-    function calculateQuote() {
-      if (fields.entryType.value !== 'Apparel Order') return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Pricing is available for apparel orders. Restock and reminder entries can still be saved.'};
-      const qty = Math.max(0, Number(fields.quantity.value) || 0);
-      if (!qty) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Enter an apparel quantity to calculate the quote.'};
-      const mode = fields.pricingMode.value;
-      const garment = fields.garmentType.value;
-      let subtotal = 0;
-      let unitPrice = 0;
-      let message = '';
-
-      if (mode === 'business_one') {
-        if (garment !== 'T-Shirt') return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'One-color staff packages currently apply to T-shirts only.'};
-        if (!PRICEBOOK.staff[qty]) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Choose exactly 12, 24, or 36 shirts for the one-color staff package.'};
-        subtotal = PRICEBOOK.staff[qty];
-        unitPrice = subtotal / qty;
-        fields.printType.value = 'one';
-        fields.printLocations.value = 'Front and Back';
-      } else if (mode === 'business_full') {
-        if (garment !== 'T-Shirt') return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Instant business pricing is confirmed for T-shirts. Hoodies, sweatshirts, hats, and mixed orders require a manual quote.'};
-        const tier = PRICEBOOK.businessTee.find(t=>qty>=t.min && qty<=t.max);
-        if (!tier) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Business full-color T-shirts require at least 6 pieces.'};
-        unitPrice = tier.price;
-        subtotal = qty * unitPrice;
-      } else {
-        if (garment === 'T-Shirt') unitPrice = fields.printType.value === 'white' ? PRICEBOOK.personal.tshirtWhite : PRICEBOOK.personal.tshirtFull;
-        else if (garment === 'Hoodie') unitPrice = PRICEBOOK.personal.hoodie;
-        else if (garment === 'Sweatshirt') unitPrice = PRICEBOOK.personal.sweatshirt;
-        else return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'This garment needs a manual quote before payment.'};
-        subtotal = qty * unitPrice;
-      }
-
-      const q2 = Math.max(0, Number(fields.qty2xl.value) || 0);
-      const q3 = Math.max(0, Number(fields.qty3xl.value) || 0);
-      const q4 = Math.max(0, Number(fields.qty4plus.value) || 0);
-      if (q2 + q3 + q4 > qty) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Larger-size counts cannot exceed the total shirt quantity.'};
-      if (q4 > 0) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'4XL–5XL pricing must be confirmed before taking payment.'};
-      subtotal += q2 * PRICEBOOK.size.twoXL + q3 * PRICEBOOK.size.threeXL;
-
-      if (mode !== 'business_one' && fields.printLocations.value === 'Front and Back') subtotal += qty * PRICEBOOK.extraLocationPerShirt;
-      const rush = fields.turnaround.value === 'rush' ? subtotal * PRICEBOOK.rushRate : 0;
-      const taxable = subtotal + rush;
-      const tax = fields.taxMode.value === 'taxable' ? taxable * PRICEBOOK.taxRate : 0;
-      const total = taxable + tax;
-      message = `${qty} ${garment}${qty===1?'':'s'} • ${money(unitPrice)} base each${mode==='business_one'?' • Front + back included':''}`;
-      return {valid:true, qty, unitPrice, subtotal, rush, tax, total, message};
-    }
-
-    function refreshQuote() {
-      const q = calculateQuote();
-      quoteSubtotal.textContent = money(q.subtotal);
-      quoteRush.textContent = money(q.rush);
-      quoteTax.textContent = money(q.tax);
-      quoteTotal.textContent = money(q.total);
-      quoteWarning.textContent = q.message;
-      const links = [venmoPay,paypalPay,cashAppPay];
-      links.forEach(link=>link.classList.toggle('disabled',!q.valid));
-      if (!q.valid) { links.forEach(link=>link.removeAttribute('href')); return; }
-      const amount = q.total.toFixed(2);
-      const note = encodeURIComponent(`Seymore Green order - ${fields.garmentType.value}`);
-      venmoPay.href = `https://venmo.com/${PAYMENT.venmo}?txn=pay&amount=${amount}&note=${note}`;
-      paypalPay.href = `https://paypal.me/${PAYMENT.paypalMe}/${amount}`;
-      cashAppPay.href = `https://cash.app/$${PAYMENT.cashApp}/${amount}`;
-    }
-
-    function renderEntries() {
-      const entries = getEntries();
-      if (!entries.length) {
-        ordersList.innerHTML = '<div class="order-item"><p>No saved entries yet. Talk to the mic and start stacking reminders.</p></div>';
-        return;
-      }
-      ordersList.innerHTML = entries.slice().reverse().map((entry) => `
-        <div class="order-item">
-          <h4>${escapeHtml(entry.customerName || 'Unnamed entry')} — ${escapeHtml(entry.bucket)}</h4>
-          <p><strong>Type:</strong> ${escapeHtml(entry.entryType)} | <strong>Main item:</strong> ${escapeHtml(entry.inventoryType || entry.garmentType || '—')} | <strong>Qty:</strong> ${escapeHtml(entry.quantity || '—')} | <strong>Due:</strong> ${escapeHtml(formatDateForDisplay(entry.dueDate))}</p>
-          <p><strong>Color/Flavor/Strain:</strong> ${escapeHtml(entry.color || '—')} | <strong>Sizes/Pack:</strong> ${escapeHtml(entry.sizes || '—')} | <strong>Print:</strong> ${escapeHtml(entry.printLocations || '—')}</p>
-          ${entry.total ? `<p><strong>Total:</strong> ${escapeHtml(money(entry.total))} | <strong>Payment:</strong> ${escapeHtml(entry.payStatus || 'Unpaid')}</p>` : ''}
-          <p><strong>Notes:</strong> ${escapeHtml(entry.notes || entry.transcript || '—')}</p>
-          <div class="order-meta">
-            <span>${escapeHtml(entry.orderStatus || 'New')}</span>
-            ${entry.phone ? `<span>${escapeHtml(entry.phone)}</span>` : ''}
-            ${entry.email ? `<span>${escapeHtml(entry.email)}</span>` : ''}
-            <span>Saved ${escapeHtml(new Date(entry.savedAt).toLocaleString())}</span>
-          </div>
-          ${entry.total ? `<button type="button" class="ghost" style="margin-top:10px;" onclick="togglePaid('${escapeHtml(entry.id)}')">${entry.payStatus === 'Paid' ? 'Mark Unpaid' : 'Mark Paid'}</button>` : ''}
+    <!-- LEFT: INTAKE -->
+    <div>
+      <div class="panel">
+        <h2><span class="dot"></span>Voice Intake</h2>
+        <p class="sub">Tap the mic. Say the order. Example: "Twelve hoodies adult large."</p>
+        <div class="mic-wrap">
+          <button class="mic-btn" id="micBtn">TAP TO TALK</button>
+          <div class="transcript empty" id="transcript">Waiting for your voice…</div>
         </div>
-      `).join('');
+      </div>
+
+      <div class="panel">
+        <h2><span class="dot"></span>Order Details</h2>
+        <p class="sub">Voice auto-fills fields. Adjust anything manually below.</p>
+
+        <div class="form-grid">
+          <div>
+            <label class="lbl">Customer Name</label>
+            <input id="custName" placeholder="Who's buying?" autocomplete="off" />
+          </div>
+          <div>
+            <label class="lbl">Phone / Contact</label>
+            <input id="custPhone" placeholder="Phone or handle" inputmode="tel" />
+          </div>
+          <div>
+            <label class="lbl">Customer Email</label>
+            <input id="custEmail" type="email" placeholder="for receipt" inputmode="email" />
+          </div>
+          <div>
+            <label class="lbl">Product</label>
+            <select id="product">
+              <option value="">— Select product —</option>
+              <option value="shirts">T-Shirts</option>
+              <option value="hoodies">Hoodies</option>
+              <option value="buttons">Buttons</option>
+              <option value="stickers">Stickers</option>
+              <option value="businesscards">Business Cards</option>
+              <option value="flyers">Flyers</option>
+              <option value="postcards">Postcards</option>
+              <option value="mugs">Mugs</option>
+              <option value="hats">Hats</option>
+              <option value="banners">Banners</option>
+              <option value="yardsigns">Yard Signs</option>
+              <option value="cbd">CBD / THCA Product</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">Quantity</label>
+            <input id="qty" type="number" min="1" placeholder="How many?" inputmode="numeric" />
+          </div>
+        </div>
+
+        <!-- SIZES — TAP + and - BUTTONS ONLY -->
+        <div id="sizesWrap" style="display:none;margin-top:16px">
+          <div class="size-row-label">
+            <label class="lbl" style="margin-bottom:0">Sizes</label>
+            <span class="size-hint">tap + / − per size</span>
+          </div>
+          <div class="size-grid" id="sizeGrid"></div>
+        </div>
+
+        <div class="form-grid" style="margin-top:14px">
+          <div>
+            <label class="lbl">Due Date</label>
+            <input id="dueDate" type="date" />
+          </div>
+          <div>
+            <label class="lbl">Payment Status</label>
+            <select id="payStatus">
+              <option value="unpaid">Unpaid</option>
+              <option value="paid">Paid</option>
+              <option value="deposit">Deposit Taken</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label class="lbl">Notes</label>
+          <textarea id="notes" placeholder="Color, artwork, pickup/delivery, special instructions…"></textarea>
+        </div>
+
+        <div class="price-box">
+          <div>
+            <div class="label-sm">Unit Price</div>
+            <div class="value" id="unitPrice">$0.00</div>
+            <div class="rush-flag hidden" id="rushFlag">⚡ RUSH +25%</div>
+          </div>
+          <div>
+            <div class="label-sm">Order Total</div>
+            <div class="value total" id="totalPrice">$0.00</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="saveOrder">💾 Save Order</button>
+          <button class="btn btn-ghost" id="clearForm">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: PAYMENT + ORDERS -->
+    <div>
+      <div class="panel">
+        <h2><span class="dot"></span>Collect Payment</h2>
+        <p class="sub">Tap to open your payment app with the total pre-filled.</p>
+        <div class="pay-row">
+          <a class="pay-btn pay-venmo" id="payVenmo" href="#" target="_blank" rel="noopener">VENMO<small id="venmoHandle">@Seymoregreen</small></a>
+          <a class="pay-btn pay-paypal" id="payPaypal" href="#" target="_blank" rel="noopener">PAYPAL<small id="paypalHandle">sales@seymoregreen.com</small></a>
+          <a class="pay-btn pay-cashapp" id="payCashapp" href="#" target="_blank" rel="noopener">CASH APP<small id="cashappHandle">$SeymoreGreen</small></a>
+        </div>
+        <details style="margin-top:12px">
+          <summary>Payment Handles — Edit</summary>
+          <div class="settings-grid" style="margin-top:10px">
+            <div><label class="lbl">Venmo</label><input id="setVenmo" placeholder="Seymoregreen" /></div>
+            <div><label class="lbl">PayPal</label><input id="setPaypal" placeholder="sales@seymoregreen.com" /></div>
+            <div><label class="lbl">Cash App</label><input id="setCashapp" placeholder="SeymoreGreen" /></div>
+          </div>
+          <button class="btn btn-ghost" id="saveHandles" style="margin-top:10px">Save Handles</button>
+        </details>
+      </div>
+
+      <div class="panel">
+        <h2><span class="dot"></span>Order Log</h2>
+        <p class="sub">All saved orders. Tap to toggle paid. Export any time.</p>
+        <div class="btn-row" style="margin-top:0;margin-bottom:14px">
+          <button class="btn btn-ghost" id="exportCsv">CSV</button>
+          <button class="btn btn-ghost" id="exportJson">JSON</button>
+          <button class="btn btn-ghost" id="clearAll" style="margin-left:auto;color:var(--red)">Clear All</button>
+        </div>
+        <!-- Mobile cards -->
+        <div class="orders-cards" id="orderCards"></div>
+        <!-- Desktop table -->
+        <div class="orders-table-wrap">
+          <table id="ordersTbl" style="display:none">
+            <thead><tr><th>Date</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th></th></tr></thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="emptyState">No orders yet. Speak your first one.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">SEYMORE GREEN • 19 YEARS DEEP • VOICE TO POCKET v4.0</div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3>⚙ Settings</h3>
+    <p class="sub">Google Sheets sync, payment handles, and business info — all stored on this device.</p>
+    <div class="modal-section">
+      <h4>Google Sheets Webhook</h4>
+      <p class="sub" style="margin-bottom:10px">Your Apps Script URL. Every saved order posts automatically.</p>
+      <input id="setWebhook" placeholder="https://script.google.com/macros/s/..../exec" />
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="saveWebhook">Save URL</button>
+        <button class="btn btn-ghost" id="testWebhook">Test</button>
+      </div>
+      <div class="sync-status idle" id="webhookStatus">Checking…</div>
+    </div>
+    <div class="modal-section">
+      <h4>Payment Handles</h4>
+      <div class="settings-grid">
+        <div><label class="lbl">Venmo</label><input id="setVenmoModal" placeholder="Seymoregreen" /></div>
+        <div><label class="lbl">PayPal</label><input id="setPaypalModal" placeholder="sales@seymoregreen.com" /></div>
+        <div><label class="lbl">Cash App</label><input id="setCashappModal" placeholder="SeymoreGreen" /></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h4>Business Info</h4>
+      <div class="settings-grid" style="grid-template-columns:1fr 1fr">
+        <div><label class="lbl">Business Name</label><input id="setBizName" placeholder="Seymore Green" /></div>
+        <div><label class="lbl">Business Email</label><input id="setBizEmail" placeholder="sales@seymoregreen.com" /></div>
+      </div>
+    </div>
+    <div class="modal-close-row">
+      <button class="btn btn-primary" id="saveAllSettings">Save All</button>
+      <button class="btn btn-ghost" id="closeSettings">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved ✓</div>
+
+<script>
+/* ── PRICING ── */
+const PRICING = {
+  shirts:       [{min:500,p:12.99},{min:100,p:14.99},{min:50,p:17.99},{min:25,p:20.99},{min:10,p:24.99},{min:6,p:27.99},{min:1,p:30.00}],
+  hoodies:      [{min:500,p:24.99},{min:100,p:27.99},{min:50,p:32.99},{min:25,p:36.99},{min:10,p:42.99},{min:6,p:47.99},{min:1,p:55.00}],
+  buttons:      [{min:100,p:1.50},{min:50,p:2.00},{min:25,p:2.50},{min:10,p:3.00},{min:1,p:4.00}],
+  stickers:     [{min:100,p:1.50},{min:50,p:2.00},{min:25,p:2.50},{min:10,p:3.00},{min:1,p:4.00}],
+  businesscards:[{min:1000,p:0.10},{min:500,p:0.15},{min:250,p:0.20},{min:100,p:0.30},{min:1,p:0.50}],
+  flyers:       [{min:500,p:0.75},{min:250,p:1.00},{min:100,p:1.25},{min:50,p:1.75},{min:1,p:2.50}],
+  postcards:    [{min:500,p:0.65},{min:250,p:0.85},{min:100,p:1.10},{min:50,p:1.50},{min:1,p:2.00}],
+  mugs:         [{min:100,p:8.99},{min:50,p:10.99},{min:25,p:12.99},{min:10,p:14.99},{min:1,p:17.99}],
+  hats:         [{min:100,p:15.99},{min:50,p:18.99},{min:25,p:21.99},{min:10,p:24.99},{min:1,p:27.99}],
+  banners:      [{min:10,p:35.00},{min:5,p:45.00},{min:1,p:55.00}],
+  yardsigns:    [{min:50,p:8.99},{min:25,p:10.99},{min:10,p:12.99},{min:1,p:15.99}],
+  cbd:          [{min:1,p:0}]
+};
+const SIZES_APPAREL = ['YXS','YS','YM','YL','YXL','XS','S','M','L','XL','2XL','3XL','4XL','5XL'];
+const SIZES_HATS    = ['Adj','S/M','L/XL'];
+const SIZE_MAP      = {shirts:SIZES_APPAREL, hoodies:SIZES_APPAREL, hats:SIZES_HATS};
+const RUSH_MARKUP   = 0.25;
+const RUSH_DAYS     = 3;
+const WEBHOOK_URL   = 'https://script.google.com/macros/s/AKfycbzUyz0Szux6GtyBd6qYTlNqRcy_4bhRP_g541neyOE4lYGpC1llereCmchgPIZ8m9GYlA/exec';
+
+/* ── STATE ── */
+let orders    = JSON.parse(localStorage.getItem('v2p_orders') || '[]');
+let sizeCounts = {};
+let handles   = JSON.parse(localStorage.getItem('v2p_handles') || '{}');
+handles.venmo   = handles.venmo   || 'Seymoregreen';
+handles.paypal  = handles.paypal  || 'sales@seymoregreen.com';
+handles.cashapp = handles.cashapp || 'SeymoreGreen';
+let settings  = JSON.parse(localStorage.getItem('v2p_settings') || '{}');
+settings.webhook  = settings.webhook  || WEBHOOK_URL;
+settings.bizName  = settings.bizName  || 'Seymore Green';
+settings.bizEmail = settings.bizEmail || 'sales@seymoregreen.com';
+
+/* ── DOM ── */
+const $ = id => document.getElementById(id);
+const micBtn    = $('micBtn'),  transcript = $('transcript');
+const productSel= $('product'), qtyEl = $('qty'), dueDateEl = $('dueDate');
+const sizesWrap = $('sizesWrap'), sizeGrid = $('sizeGrid');
+const unitPriceEl = $('unitPrice'), totalPriceEl = $('totalPrice'), rushFlag = $('rushFlag');
+
+/* ── VOICE ── */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null, isListening = false;
+
+// Human-readable mic error messages
+const MIC_ERRORS = {
+  'not-allowed':   '🚫 Mic blocked — tap the 🔒 in your address bar and allow microphone, then reload.',
+  'network':       '📡 Network error — Chrome needs internet to process speech. Check your connection.',
+  'no-speech':     '🤫 No speech detected — speak louder or closer to your mic.',
+  'audio-capture': '🎤 No microphone found — check that your device has a mic and it\'s not in use.',
+  'aborted':       'Mic stopped — tap again to retry.',
+  'service-not-allowed': '🚫 Mic blocked — this page must be on HTTPS. Open it via your Netlify link, not a local file.'
+};
+
+if (SpeechRec) {
+  recognition = new SpeechRec();
+  recognition.continuous = false; recognition.interimResults = true; recognition.lang = 'en-US';
+  recognition.onresult = e => {
+    let interim='', final='';
+    for (let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
     }
+    const text=(final||interim).trim();
+    transcript.textContent=text||'...'; transcript.classList.remove('empty');
+    if(final) parseVoice(final);
+  };
+  recognition.onerror = e=>{
+    const msg = MIC_ERRORS[e.error] || ('Mic error: ' + e.error + ' — try reloading.');
+    transcript.textContent = msg;
+    transcript.classList.remove('empty');
+    stopListening();
+  };
+  recognition.onend = ()=>stopListening();
+} else {
+  $('chipMic').textContent='✕ No Mic'; $('chipMic').classList.remove('on');
+  micBtn.disabled=true; micBtn.textContent='CHROME ONLY';
+  transcript.textContent='Open in Chrome or Edge for voice support.';
+}
 
-    function inferEntryType(text) {
-      const t = text.toLowerCase();
-      if (/(pre-roll|preroll|disposable|flower|edible|gummies|gummy|cbd lotion|restock|reorder|order more|inventory)/.test(t)) return 'Hemp Restock';
-      if (/(hot item|hot design|item of the week|design of the week|reminder|don't forget to make|dont forget to make)/.test(t)) return 'Hot Item Reminder';
-      return 'Apparel Order';
-    }
-
-    function inferInventoryType(text, entryType) {
-      const t = text.toLowerCase();
-      if (/(pre-roll|preroll)/.test(t)) return 'Pre-Rolls';
-      if (/(disposable|disposables|vape)/.test(t)) return 'Disposables';
-      if (/\bflower\b/.test(t)) return 'Flower';
-      if (/(edible|edibles|gummies|gummy)/.test(t)) return 'Edibles / Gummies';
-      if (/(cbd lotion|lotion)/.test(t)) return 'CBD Lotion';
-      if (/(hot design|design of the week|make this design)/.test(t)) return 'Hot T-Shirt Design';
-      if (/(hot item|item of the week|hot product)/.test(t)) return 'Hot Product of the Week';
-      return entryType === 'Hot Item Reminder' ? 'General Reminder' : '';
-    }
-
-    function inferGarmentType(text) {
-      const t = text.toLowerCase();
-      if (/(hoodie|hoodies)/.test(t)) return 'Hoodie';
-      if (/(sweatshirt|crewneck|crew neck)/.test(t)) return 'Sweatshirt';
-      if (/(hat|cap|trucker)/.test(t)) return 'Hat';
-      if (/(mixed|apparel|shirts and hoodies|hoodies and shirts)/.test(t)) return 'Mixed Apparel';
-      if (/(shirt|tee|t-shirt|t shirt)/.test(t)) return 'T-Shirt';
-      return fields.garmentType.value || 'Other';
-    }
-
-    function inferQuantity(text) {
-      const t = text.toLowerCase();
-      const numberWords = {
-        one: 1, two: 2, three: 3, four: 4, five: 5,
-        six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-        eleven: 11, twelve: 12, thirteen: 13, fourteen: 14,
-        fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18,
-        nineteen: 19, twenty: 20, twentyfour: 24, twentyfive: 25,
-        thirtysix: 36, fifty: 50, hundred: 100
-      };
-      const itemMatch = t.match(/\b(\d{1,3})\s*(?:shirts?|tees?|t-shirts?|hoodies?|sweatshirts?|hats?|pieces?|pcs?)\b/);
-      if (itemMatch) return Number(itemMatch[1]);
-      const withoutContacts = t
-        .replace(/(?:\+?1?[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}/g, ' ')
-        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/ig, ' ');
-      const digitMatch = withoutContacts.match(/\b(\d{1,3})\b/);
-      if (digitMatch) return Number(digitMatch[1]);
-      const compact = t.replace(/[\s-]+/g, '');
-      for (const [word, value] of Object.entries(numberWords)) {
-        if (compact.includes(word)) return value;
-      }
-      return '';
-    }
-
-    function inferPrintLocations(text) {
-      const t = text.toLowerCase();
-      if (/(front and back|front back|both sides)/.test(t)) return 'Front and Back';
-      if (/(left chest)/.test(t)) return 'Left Chest';
-      if (/(front only|front print only)/.test(t)) return 'Front Only';
-      if (/(back only)/.test(t)) return 'Back Only';
-      return fields.printLocations.value || '';
-    }
-
-    function inferPricingMode(text, quantity) {
-      const t = text.toLowerCase();
-      if (/(staff shirts?|uniforms?|one color|one-colou?r)/.test(t) && [12,24,36].includes(Number(quantity))) return 'business_one';
-      if (/(business|company|staff|team|organization|restaurant|barber|contractor)/.test(t) || Number(quantity) >= 6) return 'business_full';
-      return 'personal';
-    }
-
-    function inferPrintType(text, pricingMode) {
-      const t = text.toLowerCase();
-      if (pricingMode === 'business_one' || /(one color|one-colou?r)/.test(t)) return 'one';
-      if (/(white print|white ink)/.test(t)) return 'white';
-      return 'full';
-    }
-
-    function inferDueDate(text) {
-      const t = text.toLowerCase();
-      const now = new Date();
-      const due = new Date(now);
-      due.setHours(17, 0, 0, 0);
-
-      if (/tomorrow/.test(t)) { due.setDate(due.getDate() + 1); return toLocalInputValue(due); }
-      if (/today/.test(t)) return toLocalInputValue(due);
-      if (/next week/.test(t)) { due.setDate(due.getDate() + 7); return toLocalInputValue(due); }
-
-      const dayMap = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6 };
-      for (const [dayName, dayIndex] of Object.entries(dayMap)) {
-        if (new RegExp(`\\b${dayName}\\b`).test(t)) {
-          const current = now.getDay();
-          let diff = dayIndex - current;
-          if (diff <= 0 || /next\s+/.test(t)) diff += 7;
-          due.setDate(now.getDate() + diff);
-          return toLocalInputValue(due);
-        }
-      }
-      return fields.dueDate.value || '';
-    }
-
-    function inferColor(text) {
-      const colors = ['black', 'white', 'red', 'green', 'blue', 'gray', 'grey', 'navy', 'pink', 'purple', 'gold', 'yellow', 'orange', 'lemon', 'sour diesel'];
-      const t = text.toLowerCase();
-      const found = colors.find(color => t.includes(color));
-      return found ? found.split(' ').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ') : (fields.color.value || '');
-    }
-
-    function inferBucket(quantity, garmentType, transcript, entryType) {
-      const t = (transcript || '').toLowerCase();
-      const garment = (garmentType || '').toLowerCase();
-
-      if (entryType === 'Hemp Restock') return 'Hemp Restock';
-      if (entryType === 'Hot Item Reminder') return 'Hot Item of the Week';
-      if ((quantity === 1 || String(quantity) === '1') && garment === 't-shirt') return 'One T';
-      if (Number(quantity) >= 6 && garment === 't-shirt') return 'Custom T-Shirt 6+';
-      if (/(hoodie|sweatshirt|hat|mixed)/.test(garment) || /(hoodie|hoodies|sweatshirt|crewneck|hat|mixed apparel|shirts and hoodies)/.test(t)) return 'Custom More Apparel';
-      return 'Custom Anything';
-    }
-
-    function maybeAdjustStatus(entryType) {
-      if (entryType === 'Hemp Restock') fields.orderStatus.value = 'Need to Order';
-      else if (entryType === 'Hot Item Reminder') fields.orderStatus.value = 'Idea';
-      else if (fields.orderStatus.value === 'Need to Order' || fields.orderStatus.value === 'Idea') fields.orderStatus.value = 'New';
-    }
-
-    function toLocalInputValue(date) {
-      const pad = (n) => String(n).padStart(2, '0');
-      return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-    }
-
-    function parseTranscript() {
-      const text = fields.transcript.value.trim();
-      if (!text) return;
-
-      const entryType = inferEntryType(text);
-      const garmentType = inferGarmentType(text);
-      const quantity = inferQuantity(text);
-      const pricingMode = inferPricingMode(text, quantity);
-      const printType = inferPrintType(text, pricingMode);
-      const printLocations = inferPrintLocations(text);
-      const dueDate = inferDueDate(text);
-      const color = inferColor(text);
-      const inventoryType = inferInventoryType(text, entryType);
-      const bucket = inferBucket(quantity, garmentType, text, entryType);
-
-      fields.entryType.value = entryType;
-      maybeAdjustStatus(entryType);
-      fields.garmentType.value = garmentType;
-      fields.pricingMode.value = pricingMode;
-      fields.printType.value = printType;
-      if (quantity) fields.quantity.value = quantity;
-      if (printLocations) fields.printLocations.value = printLocations;
-      if (dueDate) fields.dueDate.value = dueDate;
-      if (color) fields.color.value = color;
-      if (inventoryType) fields.inventoryType.value = inventoryType;
-      fields.bucket.value = bucket;
-      updateBucketPills(bucket);
-      refreshQuote();
-
-      const phoneMatch = text.match(/(\+?1?[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})/);
-      if (phoneMatch && !fields.phone.value) fields.phone.value = phoneMatch[0].trim();
-
-      const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-      if (emailMatch && !fields.email.value) fields.email.value = emailMatch[0];
-    }
-
-    function getFormData() {
-      const quote = calculateQuote();
-      return {
-        id: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`),
-        transcript: fields.transcript.value.trim(),
-        entryType: fields.entryType.value,
-        bucket: fields.bucket.value,
-        orderStatus: fields.orderStatus.value,
-        customerName: fields.customerName.value.trim(),
-        phone: fields.phone.value.trim(),
-        email: fields.email.value.trim(),
-        dueDate: fields.dueDate.value,
-        pricingMode: fields.pricingMode.value,
-        garmentType: fields.garmentType.value,
-        quantity: fields.quantity.value,
-        printType: fields.printType.value,
-        inventoryType: fields.inventoryType.value,
-        color: fields.color.value.trim(),
-        sizes: fields.sizes.value.trim(),
-        printLocations: fields.printLocations.value.trim(),
-        qty2xl: fields.qty2xl.value,
-        qty3xl: fields.qty3xl.value,
-        qty4plus: fields.qty4plus.value,
-        turnaround: fields.turnaround.value,
-        taxMode: fields.taxMode.value,
-        payStatus: fields.payStatus.value,
-        subtotal: quote.valid ? quote.subtotal : '',
-        rushFee: quote.valid ? quote.rush : '',
-        tax: quote.valid ? quote.tax : '',
-        total: quote.valid ? quote.total : '',
-        notes: fields.notes.value.trim(),
-        savedAt: new Date().toISOString()
-      };
-    }
-
-    function buildCalendarUrl(data) {
-      const mainItem = data.inventoryType || data.garmentType || 'Entry';
-      const titleBits = [
-        data.customerName || 'SG Reminder',
-        data.entryType,
-        mainItem,
-        data.quantity ? `Qty ${data.quantity}` : ''
-      ].filter(Boolean);
-
-      const details = [
-        `Entry Type: ${data.entryType}`,
-        `Bucket: ${data.bucket}`,
-        `Status: ${data.orderStatus}`,
-        `Customer/Vendor/Name: ${data.customerName || '—'}`,
-        `Phone: ${data.phone || '—'}`,
-        `Email: ${data.email || '—'}`,
-        `Apparel Type: ${data.garmentType || '—'}`,
-        `Inventory / Reminder Type: ${data.inventoryType || '—'}`,
-        `Quantity: ${data.quantity || '—'}`,
-        `Color / Flavor / Strain: ${data.color || '—'}`,
-        `Sizes / Pack Size: ${data.sizes || '—'}`,
-        `Print Locations: ${data.printLocations || '—'}`,
-        `Pricing Lane: ${data.pricingMode || '—'}`,
-        `Payment Status: ${data.payStatus || '—'}`,
-        `Total: ${data.total ? money(data.total) : 'Pending quote'}`,
-        `Notes: ${data.notes || '—'}`,
-        `Transcript: ${data.transcript || '—'}`
-      ].join('\n');
-
-      const params = new URLSearchParams({
-        action: 'TEMPLATE',
-        text: titleBits.join(' - '),
-        details
-      });
-      const dates = formatDateForGoogleCalendar(data.dueDate);
-      if (dates) params.set('dates', dates);
-      return `https://calendar.google.com/calendar/render?${params.toString()}`;
-    }
-
-    function clearForm() {
-      Object.values(fields).forEach((field) => {
-        if (field.tagName === 'SELECT') return;
-        field.value = '';
-      });
-      fields.entryType.value = 'Apparel Order';
-      fields.bucket.value = 'One T';
-      fields.orderStatus.value = 'New';
-      fields.garmentType.value = 'T-Shirt';
-      fields.inventoryType.value = '';
-      fields.pricingMode.value = 'personal';
-      fields.printType.value = 'full';
-      fields.printLocations.value = 'Front Only';
-      fields.qty2xl.value = '0';
-      fields.qty3xl.value = '0';
-      fields.qty4plus.value = '0';
-      fields.turnaround.value = 'standard';
-      fields.taxMode.value = 'taxable';
-      fields.payStatus.value = 'Unpaid';
-      updateBucketPills('One T');
-      refreshQuote();
-    }
-
-    function saveEntry(openCalendar = false) {
-      const data = getFormData();
-      if (!data.transcript && !data.customerName && !data.notes) {
-        setStatus('Add at least a transcript, name, or notes before saving.', 'warn');
-        return;
-      }
-      const entries = getEntries();
-      entries.push(data);
-      setEntries(entries);
-      renderEntries();
-      setStatus(openCalendar ? 'Entry saved. Google Calendar is opening.' : 'Entry saved to SG Voice Order+.');
-      if (openCalendar) window.open(buildCalendarUrl(data), '_blank');
-    }
-
-    function togglePaid(id) {
-      const entries = getEntries();
-      const entry = entries.find(item=>item.id === id);
-      if (!entry) return;
-      entry.payStatus = entry.payStatus === 'Paid' ? 'Unpaid' : 'Paid';
-      setEntries(entries);
-      renderEntries();
-      setStatus(`Order marked ${entry.payStatus}.`);
-    }
-
-    function exportCsv() {
-      const entries = getEntries();
-      if (!entries.length) {
-        setStatus('No entries to export yet.', 'warn');
-        return;
-      }
-      const headers = ['id','savedAt','entryType','bucket','orderStatus','customerName','phone','email','dueDate','pricingMode','garmentType','quantity','printType','inventoryType','color','sizes','printLocations','qty2xl','qty3xl','qty4plus','turnaround','taxMode','subtotal','rushFee','tax','total','payStatus','notes','transcript'];
-      const csv = [headers.join(',')]
-        .concat(entries.map(entry => headers.map(header => `"${String(entry[header] || '').replace(/"/g, '""')}"`).join(',')))
-        .join('\n');
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sg-voice-order-plus-export.csv';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      setStatus('CSV exported.');
-    }
-
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.interimResults = true;
-      recognition.continuous = false;
-
-      recognition.onstart = () => {
-        listening = true;
-        micBtn.classList.add('listening');
-        micBtn.textContent = '🔴 Listening... Tap to Stop';
-        voiceStatus.textContent = 'Listening now. Speak the order or reminder clearly.';
-        voiceStatus.className = 'status show';
-      };
-
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript + ' ';
-        }
-        fields.transcript.value = transcript.trim();
-        parseTranscript();
-      };
-
-      recognition.onerror = (event) => {
-        voiceStatus.textContent = `Voice capture error: ${event.error}. You can still type manually.`;
-        voiceStatus.className = 'status warn show';
-      };
-
-      recognition.onend = () => {
-        listening = false;
-        micBtn.classList.remove('listening');
-        micBtn.textContent = '🎤 Start Voice Capture';
-      };
+async function startListening(){
+  if(!recognition) return;
+  // Step 1: Check for HTTPS / localhost (Chrome Speech API requires it)
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if(!isSecure){
+    transcript.textContent = '🚫 Voice needs HTTPS — open this app via your Netlify link, not a local file.';
+    transcript.classList.remove('empty');
+    showToast('Open via Netlify for voice ⚠', true);
+    return;
+  }
+  // Step 2: Explicitly request mic permission first — this triggers the browser dialog
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(t => t.stop()); // release immediately — just needed the permission grant
+  } catch(permErr){
+    transcript.textContent = '🚫 Mic permission denied — tap the 🔒 in your address bar → allow microphone → reload.';
+    transcript.classList.remove('empty');
+    showToast('Allow mic in browser settings', true);
+    return;
+  }
+  // Step 3: Start speech recognition
+  try{
+    recognition.start();
+    isListening=true;
+    micBtn.classList.add('listening');
+    micBtn.textContent='LISTENING…';
+    transcript.textContent='Go… speak the order.';
+    transcript.classList.remove('empty');
+  } catch(e){
+    // Happens if recognition.start() is called while already running
+    if(e.name === 'InvalidStateError'){
+      recognition.stop();
+      setTimeout(()=>startListening(), 300);
     } else {
-      micBtn.disabled = true;
-      voiceStatus.textContent = 'This browser does not support speech recognition. You can still use the app by typing your entry manually.';
-      voiceStatus.className = 'status warn show';
+      transcript.textContent = 'Could not start mic: ' + e.message;
+      transcript.classList.remove('empty');
     }
+  }
+}
+function stopListening(){ isListening=false; micBtn.classList.remove('listening'); micBtn.textContent='TAP TO TALK'; }
+micBtn.addEventListener('click',()=>{ if(isListening){recognition&&recognition.stop();stopListening();}else startListening(); });
 
-    micBtn.addEventListener('click', () => {
-      if (!recognition) return;
-      if (listening) recognition.stop();
-      else recognition.start();
+/* ── PARSE VOICE ── */
+const WORD_NUM = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,dozen:12,'a dozen':12,hundred:100};
+const PROD_MAP = [
+  {key:'hoodies',words:['hoodie','hoody','hoodies','sweatshirt','sweatshirts','pullover']},
+  {key:'shirts', words:['shirt','shirts','tshirt','tshirts','t-shirt','t-shirts','tee','tees']},
+  {key:'buttons',words:['button','buttons','pin','pins']},
+  {key:'stickers',words:['sticker','stickers','decal','decals']},
+  {key:'businesscards',words:['business card','business cards','bizcard']},
+  {key:'flyers',words:['flyer','flyers','flier']},
+  {key:'postcards',words:['postcard','postcards']},
+  {key:'mugs',words:['mug','mugs','cup','cups']},
+  {key:'hats',words:['hat','hats','cap','caps','beanie','beanies']},
+  {key:'banners',words:['banner','banners']},
+  {key:'yardsigns',words:['yard sign','yard signs','lawn sign']},
+  {key:'cbd',words:['cbd','thca','thc','gummies','flower','pre-roll','vape','vapes','cart','carts']}
+];
+const SZ_WORDS = {'xs':'XS','extra small':'XS','small':'S','medium':'M','med':'M','large':'L','extra large':'XL','xl':'XL','x-large':'XL','2xl':'2XL','2x':'2XL','xxl':'2XL','double xl':'2XL','3xl':'3XL','3x':'3XL','4xl':'4XL','4x':'4XL','5xl':'5XL','5x':'5XL'};
+function parseVoice(text){
+  const t=text.toLowerCase();
+  let qty=null;
+  const dm=t.match(/(\d+)/); if(dm) qty=parseInt(dm[1]);
+  else { for(const w in WORD_NUM){ if(new RegExp('\\b'+w+'\\b').test(t)){qty=WORD_NUM[w];break;} } }
+  let prod=null;
+  for(const p of PROD_MAP){ for(const w of p.words){ if(new RegExp('\\b'+w.replace(/[-]/g,'[- ]?')+'\\b').test(t)){prod=p.key;break;} } if(prod) break; }
+  if(qty) qtyEl.value=qty;
+  if(prod) productSel.value=prod;
+  renderSizes();
+  if(prod&&SIZE_MAP[prod]){
+    Object.keys(SZ_WORDS).sort((a,b)=>b.length-a.length).forEach(sw=>{
+      const can=SZ_WORDS[sw]; if(!SIZE_MAP[prod].includes(can)) return;
+      const m=t.match(new RegExp('\\b'+sw+'\\b','g')); if(m) sizeCounts[can]=(sizeCounts[can]||0)+m.length;
     });
+    renderSizes();
+  }
+  recalcPrice(); showToast('Got it — check the form ✓');
+}
 
-    clearBtn.addEventListener('click', clearForm);
-    exportBtn.addEventListener('click', exportCsv);
-    saveBtn.addEventListener('click', () => saveEntry(false));
-    calendarBtn.addEventListener('click', () => saveEntry(true));
-    fields.transcript.addEventListener('input', parseTranscript);
-
-    fields.quantity.addEventListener('input', () => {
-      const bucket = inferBucket(fields.quantity.value, fields.garmentType.value, fields.transcript.value, fields.entryType.value);
-      fields.bucket.value = bucket;
-      updateBucketPills(bucket);
-      refreshQuote();
+/* ── SIZES — PLUS / MINUS ── */
+function renderSizes(){
+  const prod=productSel.value, sizes=SIZE_MAP[prod];
+  if(!sizes){sizesWrap.style.display='none';sizeGrid.innerHTML='';return;}
+  sizesWrap.style.display='block';
+  sizeGrid.innerHTML=sizes.map(s=>{
+    const c=sizeCounts[s]||0;
+    return `<div class="size-row${c>0?' has-count':''}" id="srow-${s}">
+      <div class="size-name">${s}</div>
+      <div class="size-controls">
+        <button class="sz-btn minus" data-s="${s}" data-a="minus" aria-label="Remove ${s}">−</button>
+        <div class="sz-count${c===0?' zero':''}" id="sc-${s}">${c}</div>
+        <button class="sz-btn plus" data-s="${s}" data-a="plus" aria-label="Add ${s}">+</button>
+      </div>
+    </div>`;
+  }).join('');
+  sizeGrid.querySelectorAll('.sz-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const s=btn.dataset.s, a=btn.dataset.a;
+      if(a==='plus') sizeCounts[s]=(sizeCounts[s]||0)+1;
+      else if(sizeCounts[s]>0){ sizeCounts[s]--; if(!sizeCounts[s]) delete sizeCounts[s]; }
+      const c=sizeCounts[s]||0;
+      const row=$('srow-'+s), cnt=$('sc-'+s);
+      row.classList.toggle('has-count',c>0);
+      cnt.textContent=c; cnt.classList.toggle('zero',c===0);
+      recalcPrice();
     });
+  });
+}
 
-    fields.garmentType.addEventListener('change', () => {
-      const bucket = inferBucket(fields.quantity.value, fields.garmentType.value, fields.transcript.value, fields.entryType.value);
-      fields.bucket.value = bucket;
-      updateBucketPills(bucket);
-      refreshQuote();
-    });
+/* ── PRICING ── */
+function getUnit(prod,qty){ const t=PRICING[prod]; if(!t||!qty) return 0; const s=[...t].sort((a,b)=>b.min-a.min); for(const x of s) if(qty>=x.min) return x.p; return s[s.length-1].p; }
+function isRush(){ if(!dueDateEl.value) return false; const d=new Date(dueDateEl.value),n=new Date(); n.setHours(0,0,0,0); return Math.ceil((d-n)/864e5)>=0&&Math.ceil((d-n)/864e5)<=RUSH_DAYS; }
+function recalcPrice(){
+  const prod=productSel.value, qty=parseInt(qtyEl.value)||0;
+  let unit=getUnit(prod,qty); const rush=isRush();
+  if(rush) unit*=(1+RUSH_MARKUP);
+  const total=unit*qty;
+  unitPriceEl.textContent='$'+unit.toFixed(2);
+  totalPriceEl.textContent='$'+total.toFixed(2);
+  rushFlag.classList.toggle('hidden',!rush);
+  updatePayLinks(total);
+}
+productSel.addEventListener('change',()=>{sizeCounts={};renderSizes();recalcPrice();});
+qtyEl.addEventListener('input',recalcPrice);
+dueDateEl.addEventListener('change',recalcPrice);
 
-    fields.entryType.addEventListener('change', () => {
-      maybeAdjustStatus(fields.entryType.value);
-      const bucket = inferBucket(fields.quantity.value, fields.garmentType.value, fields.transcript.value, fields.entryType.value);
-      if (fields.entryType.value === 'Hemp Restock' && !fields.inventoryType.value) fields.inventoryType.value = 'Pre-Rolls';
-      if (fields.entryType.value === 'Hot Item Reminder' && !fields.inventoryType.value) fields.inventoryType.value = 'Hot T-Shirt Design';
-      fields.bucket.value = bucket;
-      updateBucketPills(bucket);
-      refreshQuote();
-    });
+/* ── PAYMENT LINKS ── */
+function updatePayLinks(total){
+  const amt=total.toFixed(2), note=encodeURIComponent('Seymore Green order - '+(productSel.value||'items'));
+  $('payVenmo').href=`https://venmo.com/${encodeURIComponent(handles.venmo)}?txn=pay&amount=${amt}&note=${note}`;
+  const pp=handles.paypal.includes('@')?handles.paypal.split('@')[0]:handles.paypal;
+  $('payPaypal').href=`https://paypal.me/${encodeURIComponent(pp)}/${amt}`;
+  $('payCashapp').href=`https://cash.app/$${encodeURIComponent(handles.cashapp)}/${amt}`;
+  $('venmoHandle').textContent='@'+handles.venmo;
+  $('paypalHandle').textContent=handles.paypal;
+  $('cashappHandle').textContent='$'+handles.cashapp;
+}
 
-    fields.bucket.addEventListener('change', () => updateBucketPills(fields.bucket.value));
+/* ── ORDERS ── */
+function saveOrder(){
+  const prod=productSel.value, qty=parseInt(qtyEl.value)||0;
+  if(!prod||!qty){showToast('Need product + quantity',true);return;}
+  const unit=getUnit(prod,qty), rush=isRush(), fu=rush?unit*(1+RUSH_MARKUP):unit, total=fu*qty;
+  const order={id:Date.now(),date:new Date().toISOString(),customer:$('custName').value||'—',
+    phone:$('custPhone').value||'',email:$('custEmail').value||'',
+    product:prod,qty,sizes:{...sizeCounts},dueDate:dueDateEl.value||'',
+    rush,unit:fu,total,payStatus:$('payStatus').value,notes:$('notes').value||''};
+  orders.unshift(order); persist(); renderOrders();
+  syncSheets(order);
+  if(order.email&&confirm('Send receipt to '+order.email+'?')) emailReceipt(order);
+  showToast('Order saved ✓');
+}
+function persist(){ localStorage.setItem('v2p_orders',JSON.stringify(orders)); $('chipOrders').textContent=orders.length+' Orders Logged'; }
 
-    ['pricingMode','printType','printLocations','qty2xl','qty3xl','qty4plus','turnaround','taxMode'].forEach(key=>{
-      fields[key].addEventListener('input', refreshQuote);
-      fields[key].addEventListener('change', refreshQuote);
-    });
+function renderOrders(){
+  const cards=$('orderCards'), body=$('ordersBody'), empty=$('emptyState'), tbl=$('ordersTbl');
+  if(!orders.length){cards.innerHTML='';body.innerHTML='';empty.style.display='block';tbl.style.display='none';return;}
+  empty.style.display='none'; tbl.style.display='table';
+  // Mobile cards
+  cards.innerHTML=orders.map(o=>{
+    const d=new Date(o.date);
+    const ds=(d.getMonth()+1)+'/'+d.getDate()+' · '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const sz=Object.keys(o.sizes||{}).length?Object.entries(o.sizes).map(([s,c])=>`${s}×${c}`).join(' '):'—';
+    return `<div class="order-card${o.payStatus==='paid'?' is-paid':''}">
+      <div class="ocard-top">
+        <div><div class="ocard-name">${escH(o.customer)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${o.product} · qty ${o.qty}${o.rush?' · <span class="badge rush">RUSH</span>':''}</div></div>
+        <div class="ocard-total">$${o.total.toFixed(2)}</div>
+      </div>
+      <div class="ocard-meta">${ds}${o.dueDate?' · Due '+o.dueDate:''}<br>Sizes: ${sz}${o.notes?' · '+escH(o.notes.substring(0,50)):''}</div>
+      <div class="ocard-actions">
+        <span class="badge ${o.payStatus}" style="padding:5px 10px;font-size:10px">${o.payStatus.toUpperCase()}</span>
+        <button class="icon-btn" onclick="togglePaid(${o.id})">${o.payStatus==='paid'?'Mark Unpaid':'Mark Paid'}</button>
+        <button class="icon-btn danger" onclick="delOrder(${o.id})">✕ Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  // Desktop table
+  body.innerHTML=orders.map(o=>{
+    const d=new Date(o.date), ds=(d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const sz=Object.keys(o.sizes||{}).length?' <span style="color:var(--muted);font-size:10px">('+Object.entries(o.sizes).map(([s,c])=>`${s}×${c}`).join(' ')+')</span>':'';
+    return `<tr><td style="white-space:nowrap">${ds}</td><td>${escH(o.customer)}</td>
+      <td>${o.product}${sz}${o.rush?' <span class="badge rush">Rush</span>':''}</td>
+      <td>${o.qty}</td><td>$${o.total.toFixed(2)}</td>
+      <td><span class="badge ${o.payStatus}">${o.payStatus}</span></td>
+      <td style="display:flex;gap:5px">
+        <button class="icon-btn" onclick="togglePaid(${o.id})">${o.payStatus==='paid'?'Unpaid':'Paid'}</button>
+        <button class="icon-btn danger" onclick="delOrder(${o.id})">✕</button>
+      </td></tr>`;
+  }).join('');
+}
+function togglePaid(id){ const o=orders.find(x=>x.id===id); if(!o) return; o.payStatus=o.payStatus==='paid'?'unpaid':'paid'; persist(); renderOrders(); }
+function delOrder(id){ if(!confirm('Delete this order?')) return; orders=orders.filter(o=>o.id!==id); persist(); renderOrders(); }
+function escH(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-    renderEntries();
-    updateBucketPills(fields.bucket.value);
-    refreshQuote();
+$('saveOrder').addEventListener('click',saveOrder);
+$('clearForm').addEventListener('click',()=>{
+  ['custName','custPhone','custEmail','qty','notes'].forEach(id=>$(id).value='');
+  productSel.value=''; dueDateEl.value=''; $('payStatus').value='unpaid';
+  sizeCounts={}; renderSizes(); recalcPrice();
+  transcript.textContent='Waiting for your voice…'; transcript.classList.add('empty');
+});
+$('clearAll').addEventListener('click',()=>{ if(!confirm('Clear ALL orders?')) return; orders=[]; persist(); renderOrders(); });
+$('exportCsv').addEventListener('click',()=>{
+  if(!orders.length){showToast('No orders');return;}
+  const hdrs=['Date','Customer','Phone','Product','Qty','Sizes','Due','Rush','UnitPrice','Total','PayStatus','Notes'];
+  const rows=orders.map(o=>[o.date,o.customer,o.phone,o.product,o.qty,Object.entries(o.sizes).map(([s,c])=>`${s}x${c}`).join(' '),o.dueDate,o.rush?'Yes':'No',o.unit.toFixed(2),o.total.toFixed(2),o.payStatus,(o.notes||'').replace(/"/g,'""')]);
+  dl('v2p-orders.csv',[hdrs,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),'text/csv');
+});
+$('exportJson').addEventListener('click',()=>{ if(!orders.length){showToast('No orders');return;} dl('v2p-orders.json',JSON.stringify(orders,null,2),'application/json'); });
+function dl(name,content,type){ const b=new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement('a'); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u); }
 
-    let deferredInstallPrompt = null;
-    const installBtn = document.getElementById('installBtn');
-    window.addEventListener('beforeinstallprompt', event => {
-      event.preventDefault();
-      deferredInstallPrompt = event;
-      installBtn.hidden = false;
-    });
-    installBtn.addEventListener('click', async () => {
-      if (!deferredInstallPrompt) return;
-      deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      installBtn.hidden = true;
-    });
-    window.addEventListener('appinstalled', () => { installBtn.hidden = true; });
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
-    }
-  </script>
+/* ── PAYMENT HANDLES ── */
+$('setVenmo').value=handles.venmo; $('setPaypal').value=handles.paypal; $('setCashapp').value=handles.cashapp;
+$('saveHandles').addEventListener('click',()=>{
+  handles.venmo=$('setVenmo').value.trim()||'Seymoregreen';
+  handles.paypal=$('setPaypal').value.trim()||'sales@seymoregreen.com';
+  handles.cashapp=$('setCashapp').value.trim()||'SeymoreGreen';
+  localStorage.setItem('v2p_handles',JSON.stringify(handles)); recalcPrice(); showToast('Handles saved ✓');
+});
+
+/* ── SETTINGS MODAL ── */
+$('setWebhook').value=settings.webhook; $('setVenmoModal').value=handles.venmo;
+$('setPaypalModal').value=handles.paypal; $('setCashappModal').value=handles.cashapp;
+$('setBizName').value=settings.bizName; $('setBizEmail').value=settings.bizEmail;
+updateSyncChip();
+function updateSyncChip(){ const c=$('chipSync'); if(settings.webhook){c.textContent='● Sheets On';c.classList.add('on');}else{c.textContent='● Sheets Off';c.classList.remove('on');} }
+$('openSettings').addEventListener('click',()=>$('settingsModal').classList.add('show'));
+$('closeSettings').addEventListener('click',()=>$('settingsModal').classList.remove('show'));
+$('settingsModal').addEventListener('click',e=>{ if(e.target.id==='settingsModal') $('settingsModal').classList.remove('show'); });
+$('saveWebhook').addEventListener('click',()=>{
+  settings.webhook=$('setWebhook').value.trim();
+  localStorage.setItem('v2p_settings',JSON.stringify(settings));
+  const s=$('webhookStatus');
+  if(settings.webhook){s.className='sync-status ok';s.textContent='✓ URL saved — ready to sync';}
+  else{s.className='sync-status idle';s.textContent='Not connected';}
+  updateSyncChip(); showToast('Webhook saved ✓');
+});
+$('testWebhook').addEventListener('click',async()=>{
+  const url=$('setWebhook').value.trim(), s=$('webhookStatus');
+  if(!url){s.className='sync-status err';s.textContent='Paste a URL first';return;}
+  s.className='sync-status idle'; s.textContent='Testing…';
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({test:true,source:'Voice to Pocket',timestamp:new Date().toISOString()})});
+    s.className='sync-status ok'; s.textContent='✓ Sent — check your Sheet';
+  }catch(err){s.className='sync-status err';s.textContent='✗ '+err.message;}
+});
+$('saveAllSettings').addEventListener('click',()=>{
+  settings.webhook=$('setWebhook').value.trim();
+  settings.bizName=$('setBizName').value.trim()||'Seymore Green';
+  settings.bizEmail=$('setBizEmail').value.trim()||'sales@seymoregreen.com';
+  handles.venmo=$('setVenmoModal').value.trim()||'Seymoregreen';
+  handles.paypal=$('setPaypalModal').value.trim()||'sales@seymoregreen.com';
+  handles.cashapp=$('setCashappModal').value.trim()||'SeymoreGreen';
+  localStorage.setItem('v2p_settings',JSON.stringify(settings));
+  localStorage.setItem('v2p_handles',JSON.stringify(handles));
+  $('setVenmo').value=handles.venmo; $('setPaypal').value=handles.paypal; $('setCashapp').value=handles.cashapp;
+  recalcPrice(); updateSyncChip(); $('settingsModal').classList.remove('show');
+  showToast('All settings saved ✓');
+});
+
+/* ── SYNC + RECEIPT ── */
+async function syncSheets(order){
+  if(!settings.webhook) return;
+  try{ await fetch(settings.webhook,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)}); }
+  catch(e){ console.warn('Sync failed:',e); }
+}
+function emailReceipt(order){
+  if(!order.email) return;
+  const sub=encodeURIComponent(`${settings.bizName} — Order Receipt #${order.id}`);
+  const sz=Object.keys(order.sizes||{}).length?'Sizes: '+Object.entries(order.sizes).map(([s,c])=>`${s} x${c}`).join(', ')+'\n':'';
+  const body=encodeURIComponent(`Thanks for your order with ${settings.bizName}!\n\nOrder #: ${order.id}\nCustomer: ${order.customer}\nProduct: ${order.product}\nQuantity: ${order.qty}\n${sz}Unit Price: $${order.unit.toFixed(2)}${order.rush?' (Rush +25%)':''}\nOrder Total: $${order.total.toFixed(2)}\nDue Date: ${order.dueDate||'TBD'}\nPayment Status: ${order.payStatus.toUpperCase()}\n\nNotes: ${order.notes||'(none)'}\n\n— ${settings.bizName}\n${settings.bizEmail}\n19 Years Deep. If you can think it, we can print it.`);
+  window.open(`mailto:${order.email}?subject=${sub}&body=${body}`,'_blank');
+}
+
+/* ── TOAST ── */
+function showToast(msg,err){
+  const t=$('toast'); t.textContent=msg;
+  t.style.background=err?'var(--red)':'var(--green)'; t.style.color=err?'#fff':'#000';
+  t.classList.add('show'); clearTimeout(showToast._t);
+  showToast._t=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ── INIT ── */
+renderOrders(); recalcPrice(); updatePayLinks(0);
+// Show Sheets status on load
+const ws=$('webhookStatus');
+if(settings.webhook){ws.className='sync-status ok';ws.textContent='✓ Connected to Google Sheets';}
+else{ws.className='sync-status idle';ws.textContent='Not connected';}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+</script>
 </body>
 </html>

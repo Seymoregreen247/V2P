@@ -1,0 +1,1143 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice to Pocket | SG</title>
+  <meta name="description" content="Voice-powered apparel quoting and payment tool by Seymore Green." />
+  <meta name="theme-color" content="#07120c" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Voice to Pocket" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --border: rgba(255,255,255,0.1);
+      --shadow: 0 20px 40px rgba(0,0,0,0.25);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(160deg, #06111f 0%, #0f172a 50%, #111827 100%);
+      color: var(--text);
+      min-height: 100%;
+    }
+    body { padding: 18px; }
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+    .hero {
+      background: linear-gradient(140deg, rgba(34,197,94,0.2), rgba(15,23,42,0.9));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    .brand-row { display:flex; align-items:center; gap:16px; }
+    .brand-icon { width:76px; height:76px; border-radius:20px; box-shadow:0 12px 30px rgba(0,0,0,.35); flex:0 0 auto; }
+    .hero-copy { min-width:0; flex:1; }
+    .install-btn { background:#e5e7eb; color:#07120c; white-space:nowrap; }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: 0.02em;
+    }
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .tagline {
+      margin-top: 10px;
+      display: inline-block;
+      background: rgba(34,197,94,0.16);
+      color: #bbf7d0;
+      border: 1px solid rgba(34,197,94,0.35);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+    .card {
+      background: rgba(17,24,39,0.9);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .card h2, .card h3 { margin: 0 0 10px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 0.85rem; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .mic-btn { background: var(--accent); color: #052e16; min-width: 190px; }
+    .mic-btn.listening { background: var(--danger); color: white; animation: pulse 1.2s infinite; }
+    .secondary { background: #334155; color: white; }
+    .ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .money {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #03170a;
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 16px 18px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .grid-1 { grid-column: 1 / -1; }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+    input, select, textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: white;
+      padding: 12px 13px;
+      font-size: 0.96rem;
+      outline: none;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    input::placeholder, textarea::placeholder { color: #94a3b8; }
+    .status {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.24);
+      color: #bbf7d0;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.warn {
+      background: rgba(245,158,11,0.12);
+      border-color: rgba(245,158,11,0.24);
+      color: #fde68a;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 0;
+    }
+    .pill {
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: #e2e8f0;
+    }
+    .pill.active {
+      background: rgba(34,197,94,0.16);
+      border-color: rgba(34,197,94,0.35);
+      color: #bbf7d0;
+    }
+    .orders-list {
+      display: grid;
+      gap: 10px;
+      max-height: 760px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .order-item {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .order-item h4 { margin: 0 0 6px; font-size: 1rem; }
+    .order-item p {
+      margin: 6px 0;
+      color: #cbd5e1;
+      line-height: 1.4;
+      font-size: 0.92rem;
+    }
+    .order-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .order-meta span {
+      font-size: 0.8rem;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #cbd5e1;
+    }
+    .footer-note {
+      font-size: 0.84rem;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .quote-box { grid-column:1/-1; background:linear-gradient(135deg,#052e16,#07140c); border:1px solid rgba(34,197,94,.55); border-radius:18px; padding:18px; box-shadow:0 18px 45px rgba(0,0,0,.22); }
+    .quote-title { font-weight:900; color:#86efac; text-transform:uppercase; letter-spacing:.08em; }
+    .quote-lines { margin-top:12px; display:grid; gap:7px; }
+    .quote-line { display:flex; justify-content:space-between; gap:16px; color:#d1fae5; }
+    .quote-line.total { margin-top:8px; padding-top:12px; border-top:1px solid rgba(134,239,172,.35); font-size:1.35rem; font-weight:900; color:white; }
+    .quote-warning { margin-top:10px; color:#fde68a; font-weight:800; }
+    .payment-panel { grid-column:1/-1; border:1px solid var(--border); border-radius:16px; padding:16px; background:#0b1220; }
+    .payment-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+    .pay-link { display:block; text-align:center; padding:14px 10px; border-radius:12px; text-decoration:none; color:white; font-weight:900; background:#166534; }
+    .pay-link.paypal { background:#075985; }
+    .pay-link.cashapp { background:#15803d; }
+    .pay-link.disabled { opacity:.4; pointer-events:none; }
+    .payment-help { color:var(--muted); font-size:.85rem; margin-top:10px; line-height:1.45; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+      70% { box-shadow: 0 0 0 16px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+      body { padding: 12px; }
+      .hero, .card { padding: 16px; }
+      .payment-grid { grid-template-columns: 1fr; }
+      .brand-row { align-items:flex-start; flex-wrap:wrap; }
+      .brand-icon { width:64px; height:64px; border-radius:17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="brand-row">
+        <img class="brand-icon" src="icon-192.png" alt="Voice to Pocket mouth, sound and dollar sign logo" />
+        <div class="hero-copy">
+          <h1>Voice to Pocket</h1>
+          <div class="tagline">Speak the order. Price it. Pay like you weigh.</div>
+          <p>Seymore Green's voice-powered pocket register for apparel orders, instant quotes, payments, restock reminders, and hot-item ideas.</p>
+        </div>
+        <button id="installBtn" class="install-btn" type="button" hidden>Install App</button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>New Voice Entry</h2>
+        <p class="muted">Use this for apparel jobs, restock reminders, or hot item ideas. Speak the basics out loud and the app will try to sort the lane and bucket automatically.</p>
+
+        <div class="controls">
+          <button id="micBtn" class="mic-btn">🎤 Start Voice Capture</button>
+          <button id="clearBtn" class="secondary" type="button">Clear Form</button>
+          <button id="exportBtn" class="ghost" type="button">Export CSV</button>
+        </div>
+
+        <div id="voiceStatus" class="status warn show">Voice capture uses the browser speech feature. It works best in Chrome on Android and desktop. If your browser does not support it, you can still type manually.</div>
+
+        <div class="grid" style="margin-top: 14px;">
+          <div class="grid-1">
+            <label for="transcript">Voice Transcript</label>
+            <textarea id="transcript" placeholder="Example: Need to reorder two boxes of pre-rolls and gummies by Thursday. Or: John needs one black XL tee front print only due Friday. Or: Hot design of the week, make the Boston Marathon Kenya shirt."></textarea>
+          </div>
+
+          <div>
+            <label for="entryType">Entry Type</label>
+            <select id="entryType">
+              <option value="Apparel Order">Apparel Order</option>
+              <option value="Hemp Restock">Hemp Restock</option>
+              <option value="Hot Item Reminder">Hot Item Reminder</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="bucket">Bucket</label>
+            <select id="bucket">
+              <option value="One T">One T</option>
+              <option value="Custom T-Shirt 6+">Custom T-Shirt 6+</option>
+              <option value="Custom More Apparel">Custom More Apparel</option>
+              <option value="Custom Anything">Custom Anything</option>
+              <option value="Hemp Restock">Hemp Restock</option>
+              <option value="Hot Item of the Week">Hot Item of the Week</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="orderStatus">Status</label>
+            <select id="orderStatus">
+              <option value="New">New</option>
+              <option value="Needs Follow-Up">Needs Follow-Up</option>
+              <option value="Quoted">Quoted</option>
+              <option value="Rush">Rush</option>
+              <option value="Need to Order">Need to Order</option>
+              <option value="Idea">Idea</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="customerName">Customer / Vendor / Reminder Name</label>
+            <input id="customerName" type="text" placeholder="John Smith or Vendor Name" />
+          </div>
+
+          <div>
+            <label for="phone">Phone</label>
+            <input id="phone" type="text" placeholder="617-555-1111" />
+          </div>
+
+          <div>
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="customer@email.com" />
+          </div>
+
+          <div>
+            <label for="dueDate">Due Date / Reminder Date</label>
+            <input id="dueDate" type="datetime-local" />
+          </div>
+
+          <div>
+            <label for="pricingMode">Pricing Lane</label>
+            <select id="pricingMode">
+              <option value="personal">Personal</option>
+              <option value="business_full">Business Full-Color</option>
+              <option value="business_one">Business One-Color Staff Package</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="garmentType">Apparel Type</label>
+            <select id="garmentType">
+              <option value="T-Shirt">T-Shirt</option>
+              <option value="Hoodie">Hoodie</option>
+              <option value="Sweatshirt">Sweatshirt</option>
+              <option value="Hat">Hat</option>
+              <option value="Mixed Apparel">Mixed Apparel</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="quantity">Quantity</label>
+            <input id="quantity" type="number" min="1" placeholder="1" />
+          </div>
+
+          <div>
+            <label for="printType">Print Type</label>
+            <select id="printType">
+              <option value="full">Full Color</option>
+              <option value="white">White Print</option>
+              <option value="one">One Print Color</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="inventoryType">Inventory / Reminder Type</label>
+            <select id="inventoryType">
+              <option value="">Select if needed</option>
+              <option value="Pre-Rolls">Pre-Rolls</option>
+              <option value="Disposables">Disposables</option>
+              <option value="Flower">Flower</option>
+              <option value="Edibles / Gummies">Edibles / Gummies</option>
+              <option value="CBD Lotion">CBD Lotion</option>
+              <option value="Hot T-Shirt Design">Hot T-Shirt Design</option>
+              <option value="Hot Product of the Week">Hot Product of the Week</option>
+              <option value="General Reminder">General Reminder</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="color">Color / Flavor / Strain</label>
+            <input id="color" type="text" placeholder="Black, Sour Diesel, Lemon..." />
+          </div>
+
+          <div>
+            <label for="sizes">Sizes / Pack Size</label>
+            <input id="sizes" type="text" placeholder="XL or 2M, 2L, box of 25..." />
+          </div>
+
+          <div>
+            <label for="printLocations">Print Location(s)</label>
+            <select id="printLocations">
+              <option value="Front Only">Front Only</option>
+              <option value="Left Chest">Left Chest</option>
+              <option value="Front and Back">Front and Back</option>
+              <option value="Back Only">Back Only</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="qty2xl">How Many 2XL?</label>
+            <input id="qty2xl" type="number" min="0" value="0" />
+          </div>
+
+          <div>
+            <label for="qty3xl">How Many 3XL?</label>
+            <input id="qty3xl" type="number" min="0" value="0" />
+          </div>
+
+          <div>
+            <label for="qty4plus">How Many 4XL–5XL?</label>
+            <input id="qty4plus" type="number" min="0" value="0" />
+          </div>
+
+          <div>
+            <label for="turnaround">Turnaround</label>
+            <select id="turnaround">
+              <option value="standard">Standard</option>
+              <option value="rush">Rush +25%</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="taxMode">Massachusetts Sales Tax</label>
+            <select id="taxMode">
+              <option value="taxable">Apply 6.25%</option>
+              <option value="exempt">Tax Exempt</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="payStatus">Payment Status</label>
+            <select id="payStatus">
+              <option value="Unpaid">Unpaid</option>
+              <option value="Paid">Paid</option>
+              <option value="Deposit Taken">Deposit Taken</option>
+            </select>
+          </div>
+
+          <div class="grid-1">
+            <label for="notes">Notes</label>
+            <textarea id="notes" placeholder="Special instructions, reorder details, hot item notes, quote notes, pickup notes, or anything else."></textarea>
+          </div>
+
+          <div class="quote-box" id="quoteBox">
+            <div class="quote-title">Live Voice to Pocket Quote</div>
+            <div class="quote-lines">
+              <div class="quote-line"><span>Merchandise</span><strong id="quoteSubtotal">$0.00</strong></div>
+              <div class="quote-line"><span>Rush</span><strong id="quoteRush">$0.00</strong></div>
+              <div class="quote-line"><span>MA Tax</span><strong id="quoteTax">$0.00</strong></div>
+              <div class="quote-line total"><span>Total Due</span><strong id="quoteTotal">$0.00</strong></div>
+            </div>
+            <div class="quote-warning" id="quoteWarning">Enter an apparel quantity to calculate the quote.</div>
+          </div>
+
+          <div class="payment-panel">
+            <strong>Pay Now</strong>
+            <div class="payment-grid">
+              <a id="venmoPay" class="pay-link disabled" target="_blank" rel="noopener">VENMO</a>
+              <a id="paypalPay" class="pay-link paypal disabled" target="_blank" rel="noopener">PAYPAL</a>
+              <a id="cashAppPay" class="pay-link cashapp disabled" target="_blank" rel="noopener">CASH APP</a>
+            </div>
+            <div class="payment-help">Venmo @seymore-green • PayPal sales@seymoregreen.com • Cash App $iseymoregreen. Opening a payment link does not mark the order paid—confirm receipt, then change Payment Status to Paid.</div>
+          </div>
+        </div>
+
+        <div class="pill-row" id="bucketPills">
+          <span class="pill active" data-bucket-pill="One T">One T</span>
+          <span class="pill" data-bucket-pill="Custom T-Shirt 6+">Custom T-Shirt 6+</span>
+          <span class="pill" data-bucket-pill="Custom More Apparel">Custom More Apparel</span>
+          <span class="pill" data-bucket-pill="Custom Anything">Custom Anything</span>
+          <span class="pill" data-bucket-pill="Hemp Restock">Hemp Restock</span>
+          <span class="pill" data-bucket-pill="Hot Item of the Week">Hot Item of the Week</span>
+        </div>
+
+        <div class="controls" style="margin-top: 16px;">
+          <button id="saveBtn" class="money" type="button">Speak it. Save it. Sell it.</button>
+        </div>
+        <div class="controls">
+          <button id="calendarBtn" class="secondary" type="button">Save + Open Google Calendar</button>
+        </div>
+
+        <div class="footer-note">
+          Static Netlify version: entries are stored in your browser on that device. Export CSV anytime for backup. Google Calendar opens as a prefilled event so you can save it in one tap.
+        </div>
+        <div id="saveStatus" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h3>Saved Entries</h3>
+        <p class="muted small">Newest entries appear first. Apparel orders, restock reminders, and hot-item prompts all live in one clean board.</p>
+        <div class="orders-list" id="ordersList"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const storageKey = 'sgVoiceOrderPlus';
+    const fields = {
+      transcript: document.getElementById('transcript'),
+      entryType: document.getElementById('entryType'),
+      bucket: document.getElementById('bucket'),
+      orderStatus: document.getElementById('orderStatus'),
+      customerName: document.getElementById('customerName'),
+      phone: document.getElementById('phone'),
+      email: document.getElementById('email'),
+      dueDate: document.getElementById('dueDate'),
+      pricingMode: document.getElementById('pricingMode'),
+      garmentType: document.getElementById('garmentType'),
+      quantity: document.getElementById('quantity'),
+      printType: document.getElementById('printType'),
+      inventoryType: document.getElementById('inventoryType'),
+      color: document.getElementById('color'),
+      sizes: document.getElementById('sizes'),
+      printLocations: document.getElementById('printLocations'),
+      qty2xl: document.getElementById('qty2xl'),
+      qty3xl: document.getElementById('qty3xl'),
+      qty4plus: document.getElementById('qty4plus'),
+      turnaround: document.getElementById('turnaround'),
+      taxMode: document.getElementById('taxMode'),
+      payStatus: document.getElementById('payStatus'),
+      notes: document.getElementById('notes')
+    };
+
+    const micBtn = document.getElementById('micBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const calendarBtn = document.getElementById('calendarBtn');
+    const ordersList = document.getElementById('ordersList');
+    const saveStatus = document.getElementById('saveStatus');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const quoteSubtotal = document.getElementById('quoteSubtotal');
+    const quoteRush = document.getElementById('quoteRush');
+    const quoteTax = document.getElementById('quoteTax');
+    const quoteTotal = document.getElementById('quoteTotal');
+    const quoteWarning = document.getElementById('quoteWarning');
+    const venmoPay = document.getElementById('venmoPay');
+    const paypalPay = document.getElementById('paypalPay');
+    const cashAppPay = document.getElementById('cashAppPay');
+
+    const PRICEBOOK = {
+      personal: { tshirtWhite:26.99, tshirtFull:29.99, hoodie:49.99, sweatshirt:37.99 },
+      businessTee: [
+        {min:6,max:9,price:25}, {min:10,max:24,price:22}, {min:25,max:49,price:20},
+        {min:50,max:99,price:18}, {min:100,max:Infinity,price:16}
+      ],
+      staff: {12:300,24:480,36:648},
+      size: {twoXL:3,threeXL:4},
+      extraLocationPerShirt:5,
+      rushRate:.25,
+      taxRate:.0625
+    };
+
+    const PAYMENT = {
+      venmo:'seymore-green',
+      paypalMe:'seymoregreen',
+      paypalDisplay:'sales@seymoregreen.com',
+      cashApp:'iseymoregreen'
+    };
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let listening = false;
+
+    function setStatus(message, type = 'success') {
+      saveStatus.textContent = message;
+      saveStatus.className = 'status show' + (type === 'warn' ? ' warn' : '');
+      window.clearTimeout(setStatus._timer);
+      setStatus._timer = window.setTimeout(() => {
+        saveStatus.className = 'status';
+      }, 3500);
+    }
+
+    function getEntries() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setEntries(entries) {
+      localStorage.setItem(storageKey, JSON.stringify(entries));
+    }
+
+    function formatDateForDisplay(value) {
+      if (!value) return 'No date set';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString();
+    }
+
+    function formatDateForGoogleCalendar(value) {
+      if (!value) return null;
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return null;
+      const end = new Date(date.getTime() + 30 * 60 * 1000);
+      const format = (d) => {
+        const yyyy = d.getUTCFullYear();
+        const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const dd = String(d.getUTCDate()).padStart(2, '0');
+        const hh = String(d.getUTCHours()).padStart(2, '0');
+        const mi = String(d.getUTCMinutes()).padStart(2, '0');
+        const ss = String(d.getUTCSeconds()).padStart(2, '0');
+        return `${yyyy}${mm}${dd}T${hh}${mi}${ss}Z`;
+      };
+      return `${format(date)}/${format(end)}`;
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function updateBucketPills(bucket) {
+      document.querySelectorAll('[data-bucket-pill]').forEach((pill) => {
+        pill.classList.toggle('active', pill.getAttribute('data-bucket-pill') === bucket);
+      });
+    }
+
+    function money(value) { return `$${Number(value || 0).toFixed(2)}`; }
+
+    function calculateQuote() {
+      if (fields.entryType.value !== 'Apparel Order') return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Pricing is available for apparel orders. Restock and reminder entries can still be saved.'};
+      const qty = Math.max(0, Number(fields.quantity.value) || 0);
+      if (!qty) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Enter an apparel quantity to calculate the quote.'};
+      const mode = fields.pricingMode.value;
+      const garment = fields.garmentType.value;
+      let subtotal = 0;
+      let unitPrice = 0;
+      let message = '';
+
+      if (mode === 'business_one') {
+        if (garment !== 'T-Shirt') return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'One-color staff packages currently apply to T-shirts only.'};
+        if (!PRICEBOOK.staff[qty]) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Choose exactly 12, 24, or 36 shirts for the one-color staff package.'};
+        subtotal = PRICEBOOK.staff[qty];
+        unitPrice = subtotal / qty;
+        fields.printType.value = 'one';
+        fields.printLocations.value = 'Front and Back';
+      } else if (mode === 'business_full') {
+        if (garment !== 'T-Shirt') return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Instant business pricing is confirmed for T-shirts. Hoodies, sweatshirts, hats, and mixed orders require a manual quote.'};
+        const tier = PRICEBOOK.businessTee.find(t=>qty>=t.min && qty<=t.max);
+        if (!tier) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Business full-color T-shirts require at least 6 pieces.'};
+        unitPrice = tier.price;
+        subtotal = qty * unitPrice;
+      } else {
+        if (garment === 'T-Shirt') unitPrice = fields.printType.value === 'white' ? PRICEBOOK.personal.tshirtWhite : PRICEBOOK.personal.tshirtFull;
+        else if (garment === 'Hoodie') unitPrice = PRICEBOOK.personal.hoodie;
+        else if (garment === 'Sweatshirt') unitPrice = PRICEBOOK.personal.sweatshirt;
+        else return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'This garment needs a manual quote before payment.'};
+        subtotal = qty * unitPrice;
+      }
+
+      const q2 = Math.max(0, Number(fields.qty2xl.value) || 0);
+      const q3 = Math.max(0, Number(fields.qty3xl.value) || 0);
+      const q4 = Math.max(0, Number(fields.qty4plus.value) || 0);
+      if (q2 + q3 + q4 > qty) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'Larger-size counts cannot exceed the total shirt quantity.'};
+      if (q4 > 0) return {valid:false, subtotal:0, rush:0, tax:0, total:0, message:'4XL–5XL pricing must be confirmed before taking payment.'};
+      subtotal += q2 * PRICEBOOK.size.twoXL + q3 * PRICEBOOK.size.threeXL;
+
+      if (mode !== 'business_one' && fields.printLocations.value === 'Front and Back') subtotal += qty * PRICEBOOK.extraLocationPerShirt;
+      const rush = fields.turnaround.value === 'rush' ? subtotal * PRICEBOOK.rushRate : 0;
+      const taxable = subtotal + rush;
+      const tax = fields.taxMode.value === 'taxable' ? taxable * PRICEBOOK.taxRate : 0;
+      const total = taxable + tax;
+      message = `${qty} ${garment}${qty===1?'':'s'} • ${money(unitPrice)} base each${mode==='business_one'?' • Front + back included':''}`;
+      return {valid:true, qty, unitPrice, subtotal, rush, tax, total, message};
+    }
+
+    function refreshQuote() {
+      const q = calculateQuote();
+      quoteSubtotal.textContent = money(q.subtotal);
+      quoteRush.textContent = money(q.rush);
+      quoteTax.textContent = money(q.tax);
+      quoteTotal.textContent = money(q.total);
+      quoteWarning.textContent = q.message;
+      const links = [venmoPay,paypalPay,cashAppPay];
+      links.forEach(link=>link.classList.toggle('disabled',!q.valid));
+      if (!q.valid) { links.forEach(link=>link.removeAttribute('href')); return; }
+      const amount = q.total.toFixed(2);
+      const note = encodeURIComponent(`Seymore Green order - ${fields.garmentType.value}`);
+      venmoPay.href = `https://venmo.com/${PAYMENT.venmo}?txn=pay&amount=${amount}&note=${note}`;
+      paypalPay.href = `https://paypal.me/${PAYMENT.paypalMe}/${amount}`;
+      cashAppPay.href = `https://cash.app/$${PAYMENT.cashApp}/${amount}`;
+    }
+
+    function renderEntries() {
+      const entries = getEntries();
+      if (!entries.length) {
+        ordersList.innerHTML = '<div class="order-item"><p>No saved entries yet. Talk to the mic and start stacking reminders.</p></div>';
+        return;
+      }
+      ordersList.innerHTML = entries.slice().reverse().map((entry) => `
+        <div class="order-item">
+          <h4>${escapeHtml(entry.customerName || 'Unnamed entry')} — ${escapeHtml(entry.bucket)}</h4>
+          <p><strong>Type:</strong> ${escapeHtml(entry.entryType)} | <strong>Main item:</strong> ${escapeHtml(entry.inventoryType || entry.garmentType || '—')} | <strong>Qty:</strong> ${escapeHtml(entry.quantity || '—')} | <strong>Due:</strong> ${escapeHtml(formatDateForDisplay(entry.dueDate))}</p>
+          <p><strong>Color/Flavor/Strain:</strong> ${escapeHtml(entry.color || '—')} | <strong>Sizes/Pack:</strong> ${escapeHtml(entry.sizes || '—')} | <strong>Print:</strong> ${escapeHtml(entry.printLocations || '—')}</p>
+          ${entry.total ? `<p><strong>Total:</strong> ${escapeHtml(money(entry.total))} | <strong>Payment:</strong> ${escapeHtml(entry.payStatus || 'Unpaid')}</p>` : ''}
+          <p><strong>Notes:</strong> ${escapeHtml(entry.notes || entry.transcript || '—')}</p>
+          <div class="order-meta">
+            <span>${escapeHtml(entry.orderStatus || 'New')}</span>
+            ${entry.phone ? `<span>${escapeHtml(entry.phone)}</span>` : ''}
+            ${entry.email ? `<span>${escapeHtml(entry.email)}</span>` : ''}
+            <span>Saved ${escapeHtml(new Date(entry.savedAt).toLocaleString())}</span>
+          </div>
+          ${entry.total ? `<button type="button" class="ghost" style="margin-top:10px;" onclick="togglePaid('${escapeHtml(entry.id)}')">${entry.payStatus === 'Paid' ? 'Mark Unpaid' : 'Mark Paid'}</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function inferEntryType(text) {
+      const t = text.toLowerCase();
+      if (/(pre-roll|preroll|disposable|flower|edible|gummies|gummy|cbd lotion|restock|reorder|order more|inventory)/.test(t)) return 'Hemp Restock';
+      if (/(hot item|hot design|item of the week|design of the week|reminder|don't forget to make|dont forget to make)/.test(t)) return 'Hot Item Reminder';
+      return 'Apparel Order';
+    }
+
+    function inferInventoryType(text, entryType) {
+      const t = text.toLowerCase();
+      if (/(pre-roll|preroll)/.test(t)) return 'Pre-Rolls';
+      if (/(disposable|disposables|vape)/.test(t)) return 'Disposables';
+      if (/\bflower\b/.test(t)) return 'Flower';
+      if (/(edible|edibles|gummies|gummy)/.test(t)) return 'Edibles / Gummies';
+      if (/(cbd lotion|lotion)/.test(t)) return 'CBD Lotion';
+      if (/(hot design|design of the week|make this design)/.test(t)) return 'Hot T-Shirt Design';
+      if (/(hot item|item of the week|hot product)/.test(t)) return 'Hot Product of the Week';
+      return entryType === 'Hot Item Reminder' ? 'General Reminder' : '';
+    }
+
+    function inferGarmentType(text) {
+      const t = text.toLowerCase();
+      if (/(hoodie|hoodies)/.test(t)) return 'Hoodie';
+      if (/(sweatshirt|crewneck|crew neck)/.test(t)) return 'Sweatshirt';
+      if (/(hat|cap|trucker)/.test(t)) return 'Hat';
+      if (/(mixed|apparel|shirts and hoodies|hoodies and shirts)/.test(t)) return 'Mixed Apparel';
+      if (/(shirt|tee|t-shirt|t shirt)/.test(t)) return 'T-Shirt';
+      return fields.garmentType.value || 'Other';
+    }
+
+    function inferQuantity(text) {
+      const t = text.toLowerCase();
+      const numberWords = {
+        one: 1, two: 2, three: 3, four: 4, five: 5,
+        six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+        eleven: 11, twelve: 12, thirteen: 13, fourteen: 14,
+        fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18,
+        nineteen: 19, twenty: 20, twentyfour: 24, twentyfive: 25,
+        thirtysix: 36, fifty: 50, hundred: 100
+      };
+      const itemMatch = t.match(/\b(\d{1,3})\s*(?:shirts?|tees?|t-shirts?|hoodies?|sweatshirts?|hats?|pieces?|pcs?)\b/);
+      if (itemMatch) return Number(itemMatch[1]);
+      const withoutContacts = t
+        .replace(/(?:\+?1?[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}/g, ' ')
+        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/ig, ' ');
+      const digitMatch = withoutContacts.match(/\b(\d{1,3})\b/);
+      if (digitMatch) return Number(digitMatch[1]);
+      const compact = t.replace(/[\s-]+/g, '');
+      for (const [word, value] of Object.entries(numberWords)) {
+        if (compact.includes(word)) return value;
+      }
+      return '';
+    }
+
+    function inferPrintLocations(text) {
+      const t = text.toLowerCase();
+      if (/(front and back|front back|both sides)/.test(t)) return 'Front and Back';
+      if (/(left chest)/.test(t)) return 'Left Chest';
+      if (/(front only|front print only)/.test(t)) return 'Front Only';
+      if (/(back only)/.test(t)) return 'Back Only';
+      return fields.printLocations.value || '';
+    }
+
+    function inferPricingMode(text, quantity) {
+      const t = text.toLowerCase();
+      if (/(staff shirts?|uniforms?|one color|one-colou?r)/.test(t) && [12,24,36].includes(Number(quantity))) return 'business_one';
+      if (/(business|company|staff|team|organization|restaurant|barber|contractor)/.test(t) || Number(quantity) >= 6) return 'business_full';
+      return 'personal';
+    }
+
+    function inferPrintType(text, pricingMode) {
+      const t = text.toLowerCase();
+      if (pricingMode === 'business_one' || /(one color|one-colou?r)/.test(t)) return 'one';
+      if (/(white print|white ink)/.test(t)) return 'white';
+      return 'full';
+    }
+
+    function inferDueDate(text) {
+      const t = text.toLowerCase();
+      const now = new Date();
+      const due = new Date(now);
+      due.setHours(17, 0, 0, 0);
+
+      if (/tomorrow/.test(t)) { due.setDate(due.getDate() + 1); return toLocalInputValue(due); }
+      if (/today/.test(t)) return toLocalInputValue(due);
+      if (/next week/.test(t)) { due.setDate(due.getDate() + 7); return toLocalInputValue(due); }
+
+      const dayMap = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6 };
+      for (const [dayName, dayIndex] of Object.entries(dayMap)) {
+        if (new RegExp(`\\b${dayName}\\b`).test(t)) {
+          const current = now.getDay();
+          let diff = dayIndex - current;
+          if (diff <= 0 || /next\s+/.test(t)) diff += 7;
+          due.setDate(now.getDate() + diff);
+          return toLocalInputValue(due);
+        }
+      }
+      return fields.dueDate.value || '';
+    }
+
+    function inferColor(text) {
+      const colors = ['black', 'white', 'red', 'green', 'blue', 'gray', 'grey', 'navy', 'pink', 'purple', 'gold', 'yellow', 'orange', 'lemon', 'sour diesel'];
+      const t = text.toLowerCase();
+      const found = colors.find(color => t.includes(color));
+      return found ? found.split(' ').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ') : (fields.color.value || '');
+    }
+
+    function inferBucket(quantity, garmentType, transcript, entryType) {
+      const t = (transcript || '').toLowerCase();
+      const garment = (garmentType || '').toLowerCase();
+
+      if (entryType === 'Hemp Restock') return 'Hemp Restock';
+      if (entryType === 'Hot Item Reminder') return 'Hot Item of the Week';
+      if ((quantity === 1 || String(quantity) === '1') && garment === 't-shirt') return 'One T';
+      if (Number(quantity) >= 6 && garment === 't-shirt') return 'Custom T-Shirt 6+';
+      if (/(hoodie|sweatshirt|hat|mixed)/.test(garment) || /(hoodie|hoodies|sweatshirt|crewneck|hat|mixed apparel|shirts and hoodies)/.test(t)) return 'Custom More Apparel';
+      return 'Custom Anything';
+    }
+
+    function maybeAdjustStatus(entryType) {
+      if (entryType === 'Hemp Restock') fields.orderStatus.value = 'Need to Order';
+      else if (entryType === 'Hot Item Reminder') fields.orderStatus.value = 'Idea';
+      else if (fields.orderStatus.value === 'Need to Order' || fields.orderStatus.value === 'Idea') fields.orderStatus.value = 'New';
+    }
+
+    function toLocalInputValue(date) {
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function parseTranscript() {
+      const text = fields.transcript.value.trim();
+      if (!text) return;
+
+      const entryType = inferEntryType(text);
+      const garmentType = inferGarmentType(text);
+      const quantity = inferQuantity(text);
+      const pricingMode = inferPricingMode(text, quantity);
+      const printType = inferPrintType(text, pricingMode);
+      const printLocations = inferPrintLocations(text);
+      const dueDate = inferDueDate(text);
+      const color = inferColor(text);
+      const inventoryType = inferInventoryType(text, entryType);
+      const bucket = inferBucket(quantity, garmentType, text, entryType);
+
+      fields.entryType.value = entryType;
+      maybeAdjustStatus(entryType);
+      fields.garmentType.value = garmentType;
+      fields.pricingMode.value = pricingMode;
+      fields.printType.value = printType;
+      if (quantity) fields.quantity.value = quantity;
+      if (printLocations) fields.printLocations.value = printLocations;
+      if (dueDate) fields.dueDate.value = dueDate;
+      if (color) fields.color.value = color;
+      if (inventoryType) fields.inventoryType.value = inventoryType;
+      fields.bucket.value = bucket;
+      updateBucketPills(bucket);
+      refreshQuote();
+
+      const phoneMatch = text.match(/(\+?1?[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})/);
+      if (phoneMatch && !fields.phone.value) fields.phone.value = phoneMatch[0].trim();
+
+      const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+      if (emailMatch && !fields.email.value) fields.email.value = emailMatch[0];
+    }
+
+    function getFormData() {
+      const quote = calculateQuote();
+      return {
+        id: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`),
+        transcript: fields.transcript.value.trim(),
+        entryType: fields.entryType.value,
+        bucket: fields.bucket.value,
+        orderStatus: fields.orderStatus.value,
+        customerName: fields.customerName.value.trim(),
+        phone: fields.phone.value.trim(),
+        email: fields.email.value.trim(),
+        dueDate: fields.dueDate.value,
+        pricingMode: fields.pricingMode.value,
+        garmentType: fields.garmentType.value,
+        quantity: fields.quantity.value,
+        printType: fields.printType.value,
+        inventoryType: fields.inventoryType.value,
+        color: fields.color.value.trim(),
+        sizes: fields.sizes.value.trim(),
+        printLocations: fields.printLocations.value.trim(),
+        qty2xl: fields.qty2xl.value,
+        qty3xl: fields.qty3xl.value,
+        qty4plus: fields.qty4plus.value,
+        turnaround: fields.turnaround.value,
+        taxMode: fields.taxMode.value,
+        payStatus: fields.payStatus.value,
+        subtotal: quote.valid ? quote.subtotal : '',
+        rushFee: quote.valid ? quote.rush : '',
+        tax: quote.valid ? quote.tax : '',
+        total: quote.valid ? quote.total : '',
+        notes: fields.notes.value.trim(),
+        savedAt: new Date().toISOString()
+      };
+    }
+
+    function buildCalendarUrl(data) {
+      const mainItem = data.inventoryType || data.garmentType || 'Entry';
+      const titleBits = [
+        data.customerName || 'SG Reminder',
+        data.entryType,
+        mainItem,
+        data.quantity ? `Qty ${data.quantity}` : ''
+      ].filter(Boolean);
+
+      const details = [
+        `Entry Type: ${data.entryType}`,
+        `Bucket: ${data.bucket}`,
+        `Status: ${data.orderStatus}`,
+        `Customer/Vendor/Name: ${data.customerName || '—'}`,
+        `Phone: ${data.phone || '—'}`,
+        `Email: ${data.email || '—'}`,
+        `Apparel Type: ${data.garmentType || '—'}`,
+        `Inventory / Reminder Type: ${data.inventoryType || '—'}`,
+        `Quantity: ${data.quantity || '—'}`,
+        `Color / Flavor / Strain: ${data.color || '—'}`,
+        `Sizes / Pack Size: ${data.sizes || '—'}`,
+        `Print Locations: ${data.printLocations || '—'}`,
+        `Pricing Lane: ${data.pricingMode || '—'}`,
+        `Payment Status: ${data.payStatus || '—'}`,
+        `Total: ${data.total ? money(data.total) : 'Pending quote'}`,
+        `Notes: ${data.notes || '—'}`,
+        `Transcript: ${data.transcript || '—'}`
+      ].join('\n');
+
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: titleBits.join(' - '),
+        details
+      });
+      const dates = formatDateForGoogleCalendar(data.dueDate);
+      if (dates) params.set('dates', dates);
+      return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    }
+
+    function clearForm() {
+      Object.values(fields).forEach((field) => {
+        if (field.tagName === 'SELECT') return;
+        field.value = '';
+      });
+      fields.entryType.value = 'Apparel Order';
+      fields.bucket.value = 'One T';
+      fields.orderStatus.value = 'New';
+      fields.garmentType.value = 'T-Shirt';
+      fields.inventoryType.value = '';
+      fields.pricingMode.value = 'personal';
+      fields.printType.value = 'full';
+      fields.printLocations.value = 'Front Only';
+      fields.qty2xl.value = '0';
+      fields.qty3xl.value = '0';
+      fields.qty4plus.value = '0';
+      fields.turnaround.value = 'standard';
+      fields.taxMode.value = 'taxable';
+      fields.payStatus.value = 'Unpaid';
+      updateBucketPills('One T');
+      refreshQuote();
+    }
+
+    function saveEntry(openCalendar = false) {
+      const data = getFormData();
+      if (!data.transcript && !data.customerName && !data.notes) {
+        setStatus('Add at least a transcript, name, or notes before saving.', 'warn');
+        return;
+      }
+      const entries = getEntries();
+      entries.push(data);
+      setEntries(entries);
+      renderEntries();
+      setStatus(openCalendar ? 'Entry saved. Google Calendar is opening.' : 'Entry saved to SG Voice Order+.');
+      if (openCalendar) window.open(buildCalendarUrl(data), '_blank');
+    }
+
+    function togglePaid(id) {
+      const entries = getEntries();
+      const entry = entries.find(item=>item.id === id);
+      if (!entry) return;
+      entry.payStatus = entry.payStatus === 'Paid' ? 'Unpaid' : 'Paid';
+      setEntries(entries);
+      renderEntries();
+      setStatus(`Order marked ${entry.payStatus}.`);
+    }
+
+    function exportCsv() {
+      const entries = getEntries();
+      if (!entries.length) {
+        setStatus('No entries to export yet.', 'warn');
+        return;
+      }
+      const headers = ['id','savedAt','entryType','bucket','orderStatus','customerName','phone','email','dueDate','pricingMode','garmentType','quantity','printType','inventoryType','color','sizes','printLocations','qty2xl','qty3xl','qty4plus','turnaround','taxMode','subtotal','rushFee','tax','total','payStatus','notes','transcript'];
+      const csv = [headers.join(',')]
+        .concat(entries.map(entry => headers.map(header => `"${String(entry[header] || '').replace(/"/g, '""')}"`).join(',')))
+        .join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sg-voice-order-plus-export.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setStatus('CSV exported.');
+    }
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = true;
+      recognition.continuous = false;
+
+      recognition.onstart = () => {
+        listening = true;
+        micBtn.classList.add('listening');
+        micBtn.textContent = '🔴 Listening... Tap to Stop';
+        voiceStatus.textContent = 'Listening now. Speak the order or reminder clearly.';
+        voiceStatus.className = 'status show';
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript + ' ';
+        }
+        fields.transcript.value = transcript.trim();
+        parseTranscript();
+      };
+
+      recognition.onerror = (event) => {
+        voiceStatus.textContent = `Voice capture error: ${event.error}. You can still type manually.`;
+        voiceStatus.className = 'status warn show';
+      };
+
+      recognition.onend = () => {
+        listening = false;
+        micBtn.classList.remove('listening');
+        micBtn.textContent = '🎤 Start Voice Capture';
+      };
+    } else {
+      micBtn.disabled = true;
+      voiceStatus.textContent = 'This browser does not support speech recognition. You can still use the app by typing your entry manually.';
+      voiceStatus.className = 'status warn show';
+    }
+
+    micBtn.addEventListener('click', () => {
+      if (!recognition) return;
+      if (listening) recognition.stop();
+      else recognition.start();
+    });
+
+    clearBtn.addEventListener('click', clearForm);
+    exportBtn.addEventListener('click', exportCsv);
+    saveBtn.addEventListener('click', () => saveEntry(false));
+    calendarBtn.addEventListener('click', () => saveEntry(true));
+    fields.transcript.addEventListener('input', parseTranscript);
+
+    fields.quantity.addEventListener('input', () => {
+      const bucket = inferBucket(fields.quantity.value, fields.garmentType.value, fields.transcript.value, fields.entryType.value);
+      fields.bucket.value = bucket;
+      updateBucketPills(bucket);
+      refreshQuote();
+    });
+
+    fields.garmentType.addEventListener('change', () => {
+      const bucket = inferBucket(fields.quantity.value, fields.garmentType.value, fields.transcript.value, fields.entryType.value);
+      fields.bucket.value = bucket;
+      updateBucketPills(bucket);
+      refreshQuote();
+    });
+
+    fields.entryType.addEventListener('change', () => {
+      maybeAdjustStatus(fields.entryType.value);
+      const bucket = inferBucket(fields.quantity.value, fields.garmentType.value, fields.transcript.value, fields.entryType.value);
+      if (fields.entryType.value === 'Hemp Restock' && !fields.inventoryType.value) fields.inventoryType.value = 'Pre-Rolls';
+      if (fields.entryType.value === 'Hot Item Reminder' && !fields.inventoryType.value) fields.inventoryType.value = 'Hot T-Shirt Design';
+      fields.bucket.value = bucket;
+      updateBucketPills(bucket);
+      refreshQuote();
+    });
+
+    fields.bucket.addEventListener('change', () => updateBucketPills(fields.bucket.value));
+
+    ['pricingMode','printType','printLocations','qty2xl','qty3xl','qty4plus','turnaround','taxMode'].forEach(key=>{
+      fields[key].addEventListener('input', refreshQuote);
+      fields[key].addEventListener('change', refreshQuote);
+    });
+
+    renderEntries();
+    updateBucketPills(fields.bucket.value);
+    refreshQuote();
+
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      installBtn.hidden = false;
+    });
+    installBtn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      installBtn.hidden = true;
+    });
+    window.addEventListener('appinstalled', () => { installBtn.hidden = true; });
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

@@ -176,6 +176,11 @@ tr:hover{background:rgba(75,187,42,.04)}
 
 .footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
 details summary{cursor:pointer;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:10px 0;-webkit-tap-highlight-color:transparent;user-select:none;}
+.voice-note-row{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+.voice-note-row audio{width:100%;margin-top:8px}
+.voice-note-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.voice-note-actions button,.voice-note-actions a{font-size:12px;color:var(--green);background:none;border:0;cursor:pointer;text-decoration:underline}
+#noteStatus{font-size:12px;color:var(--muted);margin-top:9px}
 </style>
 </head>
 <body>
@@ -205,6 +210,25 @@ details summary{cursor:pointer;color:var(--muted);font-size:11px;font-family:'Je
           <button class="mic-btn" id="micBtn">TAP TO TALK</button>
           <div class="transcript empty" id="transcript">Waiting for your voice…</div>
         </div>
+      </div>
+
+      <div class="panel" id="spokenReminderPanel">
+        <h2><span class="dot"></span>Say Voice Note or Reminder <span id="spokenCount" style="font-size:12px;color:var(--muted);margin-left:auto">0 saved</span></h2>
+        <p class="sub">Tap the main mic and say “voice note: call supplier” or “reminder: order CBD labels.” Say just “reminder” to switch modes, then tap the mic again to dictate it.</p>
+        <div class="btn-row"><button class="btn btn-ghost" id="modeOrder">Order</button><button class="btn btn-ghost" id="modeNote">Voice Note</button><button class="btn btn-ghost" id="modeReminder">Reminder</button></div>
+        <p id="captureModeStatus" style="font-size:12px;color:var(--muted);margin-top:8px">Mode: Order</p>
+        <textarea id="spokenDraft" aria-label="Spoken note or reminder" placeholder="Your spoken words appear here. You can also type or edit them."></textarea>
+        <div class="btn-row"><button class="btn btn-primary" id="saveSpoken">Save Note / Reminder</button></div>
+        <div id="spokenList"></div>
+      </div>
+
+      <div class="panel">
+        <h2><span class="dot"></span>Voice Notes &amp; Reminders <span id="noteCount" style="font-size:12px;color:var(--muted);margin-left:auto">0 saved</span></h2>
+        <p class="sub">Record as many separate notes as your device has room for. Each stays saved on this device until you delete it.</p>
+        <input id="noteTitle" aria-label="Voice note title" placeholder="Reminder title (optional)" />
+        <div class="btn-row"><button class="btn btn-primary" id="noteRecord">🎙 Record Note</button><button class="btn btn-ghost" id="noteStop" disabled>Stop &amp; Save</button></div>
+        <div id="noteStatus" role="status">Ready to record.</div>
+        <div id="voiceNoteList"></div>
       </div>
 
       <div class="panel">
@@ -417,6 +441,116 @@ settings.webhook  = settings.webhook  || WEBHOOK_URL;
 settings.bizName  = settings.bizName  || 'Seymore Green';
 settings.bizEmail = settings.bizEmail || 'sales@seymoregreen.com';
 
+/* ── SPOKEN NOTES AND REMINDERS ── */
+let captureMode='order';
+const SPOKEN_KEY='v2p_spoken_notes_v1';
+function getSpoken(){try{return JSON.parse(localStorage.getItem(SPOKEN_KEY)||'[]')}catch{return []}}
+function setCaptureMode(mode){
+  captureMode=mode;
+  document.getElementById('captureModeStatus').textContent='Mode: '+({order:'Order',note:'Voice Note',reminder:'Reminder'}[mode]);
+  for(const [id,value] of [['modeOrder','order'],['modeNote','note'],['modeReminder','reminder']])
+    document.getElementById(id).classList.toggle('btn-primary',mode===value);
+}
+for(const [id,mode] of [['modeOrder','order'],['modeNote','note'],['modeReminder','reminder']])
+  document.getElementById(id).onclick=()=>setCaptureMode(mode);
+function renderSpoken(){
+  const notes=getSpoken(), list=document.getElementById('spokenList');list.replaceChildren();
+  document.getElementById('spokenCount').textContent=notes.length+' saved';
+  notes.slice().reverse().forEach(n=>{
+    const row=document.createElement('div');row.className='voice-note-row';
+    const title=document.createElement('strong');title.textContent=n.type==='reminder'?'⏰ Reminder':'🎙 Voice Note';
+    const date=document.createElement('small');date.style.cssText='display:block;color:var(--muted)';date.textContent=new Date(n.date).toLocaleString();
+    const body=document.createElement('p');body.textContent=n.text;body.style.margin='8px 0';
+    const del=document.createElement('button');del.className='icon-btn danger';del.textContent='Delete';
+    del.onclick=()=>{if(!confirm('Delete this entry?'))return;localStorage.setItem(SPOKEN_KEY,JSON.stringify(getSpoken().filter(x=>x.id!==n.id)));renderSpoken()};
+    row.append(title,date,body,del);list.append(row);
+  });
+  if(!notes.length)list.textContent='No spoken notes or reminders saved yet.';
+}
+document.getElementById('saveSpoken').onclick=()=>{
+  const input=document.getElementById('spokenDraft'), value=input.value.trim();
+  if(!value){showToast('Speak or type a note first',true);return}
+  const type=captureMode==='reminder'?'reminder':'note';
+  const notes=getSpoken();notes.push({id:Date.now()+Math.random(),type,text:value,date:new Date().toISOString()});
+  try{localStorage.setItem(SPOKEN_KEY,JSON.stringify(notes))}catch(e){showToast('Device storage full — could not save',true);return}
+  input.value='';renderSpoken();showToast('Saved '+type+' ✓');
+};
+function handleSpoken(text){
+  const match=text.match(/^(?:say\s+)?(voice\s*note|reminder)\b[\s,:-]*(.*)$/i);
+  if(match){
+    setCaptureMode(/^reminder/i.test(match[1])?'reminder':'note');
+    if(match[2])document.getElementById('spokenDraft').value=match[2];
+    else showToast('Mode selected — tap mic and speak your message');
+    return true;
+  }
+  if(captureMode!=='order'){
+    const draft=document.getElementById('spokenDraft');draft.value+=(draft.value?' ':'')+text;
+    return true;
+  }
+  return false;
+}
+setCaptureMode('order');renderSpoken();
+
+/* ── SAVED VOICE NOTES ── */
+const noteDbReady = new Promise((resolve,reject)=>{
+  const req=indexedDB.open('v2p_voice_notes',1);
+  req.onupgradeneeded=()=>req.result.createObjectStore('notes',{keyPath:'id',autoIncrement:true});
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
+});
+let noteRecorder=null, noteStream=null, noteChunks=[];
+const noteStatus=document.getElementById('noteStatus');
+function noteRequest(mode,operation){
+  return noteDbReady.then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction('notes',mode), req=operation(tx.objectStore('notes'));
+    req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error);
+  }));
+}
+async function renderVoiceNotes(){
+  const list=document.getElementById('voiceNoteList');
+  list.querySelectorAll('audio').forEach(a=>{if(a.dataset.url) URL.revokeObjectURL(a.dataset.url)});
+  const notes=(await noteRequest('readonly',store=>store.getAll())).reverse();
+  document.getElementById('noteCount').textContent=`${notes.length} saved`;
+  list.replaceChildren();
+  for(const note of notes){
+    const row=document.createElement('div'); row.className='voice-note-row';
+    const title=document.createElement('strong'); title.textContent=note.title||'Voice reminder';
+    const date=document.createElement('div'); date.style.cssText='font-size:11px;color:var(--muted);margin-top:3px'; date.textContent=new Date(note.date).toLocaleString();
+    const audio=document.createElement('audio'); audio.controls=true; audio.preload='none';
+    const url=URL.createObjectURL(note.blob); audio.src=url; audio.dataset.url=url;
+    const actions=document.createElement('div'); actions.className='voice-note-actions';
+    const download=document.createElement('a'); download.href=url; download.download=`voice-note-${note.id}.webm`; download.textContent='Download';
+    const remove=document.createElement('button'); remove.type='button'; remove.textContent='Delete';
+    remove.onclick=async()=>{if(!confirm('Delete this voice note?'))return; await noteRequest('readwrite',store=>store.delete(note.id)); renderVoiceNotes();};
+    actions.append(download,remove);row.append(title,date,audio,actions);list.append(row);
+  }
+  if(!notes.length) list.textContent='No voice notes saved yet.';
+}
+document.getElementById('noteRecord').onclick=async()=>{
+  try{
+    if(!window.MediaRecorder) throw Error('Recording is unavailable in this browser.');
+    noteStream=await navigator.mediaDevices.getUserMedia({audio:true}); noteChunks=[];
+    noteRecorder=new MediaRecorder(noteStream);
+    noteRecorder.ondataavailable=e=>{if(e.data.size)noteChunks.push(e.data)};
+    noteRecorder.onerror=()=>{noteStatus.textContent='Recording error. Try again.'};
+    noteRecorder.onstop=async()=>{
+      noteStream.getTracks().forEach(t=>t.stop());
+      try{
+        const blob=new Blob(noteChunks,{type:noteRecorder.mimeType||'audio/webm'});
+        if(!blob.size)throw Error('No audio was captured.');
+        await noteRequest('readwrite',store=>store.add({title:document.getElementById('noteTitle').value.trim(),date:new Date().toISOString(),blob}));
+        document.getElementById('noteTitle').value=''; noteStatus.textContent='Voice note saved on this device.';
+        await renderVoiceNotes();
+      }catch(e){noteStatus.textContent='Could not save note: '+e.message}
+      document.getElementById('noteRecord').disabled=false; document.getElementById('noteStop').disabled=true;
+    };
+    noteRecorder.start(); noteStatus.textContent='Recording… tap Stop & Save when finished.';
+    document.getElementById('noteRecord').disabled=true; document.getElementById('noteStop').disabled=false;
+  }catch(e){if(noteStream)noteStream.getTracks().forEach(t=>t.stop());noteStatus.textContent='Microphone unavailable: '+e.message}
+};
+document.getElementById('noteStop').onclick=()=>{if(noteRecorder?.state==='recording')noteRecorder.stop()};
+renderVoiceNotes().catch(e=>{noteStatus.textContent='Saved notes unavailable: '+e.message});
+
 /* ── DOM ── */
 const $ = id => document.getElementById(id);
 const micBtn    = $('micBtn'),  transcript = $('transcript');
@@ -449,7 +583,7 @@ if (SpeechRec) {
     }
     const text=(final||interim).trim();
     transcript.textContent=text||'...'; transcript.classList.remove('empty');
-    if(final) parseVoice(final);
+    if(final && !handleSpoken(final)) parseVoice(final);
   };
   recognition.onerror = e=>{
     const msg = MIC_ERRORS[e.error] || ('Mic error: ' + e.error + ' — try reloading.');

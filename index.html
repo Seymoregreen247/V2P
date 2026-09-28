@@ -277,21 +277,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:11px;font-family:'Je
           <textarea id="notes" placeholder="Color, artwork, pickup/delivery, special instructions…"></textarea>
         </div>
 
-        <div class="row" style="margin-top:14px">
-          <div>
-            <label class="lbl">Discount</label>
-            <select id="discType">
-              <option value="none">No Discount</option>
-              <option value="pct">Percent Off (%)</option>
-              <option value="flat">Flat $ Off</option>
-            </select>
-          </div>
-          <div>
-            <label class="lbl">Amount</label>
-            <input id="discAmt" type="number" min="0" step="0.01" placeholder="0" value="0" />
-          </div>
-        </div>
-
         <div class="price-box">
           <div>
             <div class="label-sm">Unit Price</div>
@@ -301,7 +286,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:11px;font-family:'Je
           <div>
             <div class="label-sm">Order Total</div>
             <div class="value total" id="totalPrice">$0.00</div>
-            <div class="label-sm" id="discNote" style="margin-top:4px;color:var(--muted)"></div>
           </div>
         </div>
 
@@ -351,16 +335,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:11px;font-family:'Je
           </table>
         </div>
         <div class="empty-state" id="emptyState">No orders yet. Speak your first one.</div>
-      </div>
-
-      <div class="panel">
-        <h2><span class="dot"></span>Voice Reminders</h2>
-        <p class="sub">Say "reminder" or "voice note" and it lands here instead of the order form.</p>
-        <div class="btn-row" style="margin-top:0;margin-bottom:14px">
-          <button class="btn btn-ghost" id="clearReminders" style="margin-left:auto;color:var(--red)">Clear All</button>
-        </div>
-        <div id="reminderList"></div>
-        <div class="empty-state" id="reminderEmpty">No voice notes yet.</div>
       </div>
     </div>
 
@@ -433,7 +407,6 @@ const WEBHOOK_URL   = 'https://script.google.com/macros/s/AKfycbzUyz0Szux6GtyBd6
 
 /* ── STATE ── */
 let orders    = JSON.parse(localStorage.getItem('v2p_orders') || '[]');
-let reminders = JSON.parse(localStorage.getItem('v2p_reminders') || '[]');
 let sizeCounts = {};
 let handles   = JSON.parse(localStorage.getItem('v2p_handles') || '{}');
 handles.venmo   = handles.venmo   || 'Seymoregreen';
@@ -552,11 +525,6 @@ const PROD_MAP = [
 const SZ_WORDS = {'xs':'XS','extra small':'XS','small':'S','medium':'M','med':'M','large':'L','extra large':'XL','xl':'XL','x-large':'XL','2xl':'2XL','2x':'2XL','xxl':'2XL','double xl':'2XL','3xl':'3XL','3x':'3XL','4xl':'4XL','4x':'4XL','5xl':'5XL','5x':'5XL'};
 function parseVoice(text){
   const t=text.toLowerCase();
-  if(/\b(remind(er|s)?|remind me|voice note|note to self)\b/.test(t)){
-    saveReminder(text);
-    showToast('📝 Saved as voice note ✓');
-    return;
-  }
   let qty=null;
   const dm=t.match(/(\d+)/); if(dm) qty=parseInt(dm[1]);
   else { for(const w in WORD_NUM){ if(new RegExp('\\b'+w+'\\b').test(t)){qty=WORD_NUM[w];break;} } }
@@ -612,25 +580,15 @@ function recalcPrice(){
   const prod=productSel.value, qty=parseInt(qtyEl.value)||0;
   let unit=getUnit(prod,qty); const rush=isRush();
   if(rush) unit*=(1+RUSH_MARKUP);
-  let total=unit*qty;
-
-  const discType=$('discType').value, discAmt=parseFloat($('discAmt').value)||0;
-  let discOff=0;
-  if(discType==='pct' && discAmt>0){ discOff=total*(Math.min(discAmt,100)/100); }
-  else if(discType==='flat' && discAmt>0){ discOff=Math.min(discAmt,total); }
-  total=Math.max(0,total-discOff);
-
+  const total=unit*qty;
   unitPriceEl.textContent='$'+unit.toFixed(2);
   totalPriceEl.textContent='$'+total.toFixed(2);
   rushFlag.classList.toggle('hidden',!rush);
-  $('discNote').textContent = discOff>0 ? `Discount applied: -$${discOff.toFixed(2)}` : '';
   updatePayLinks(total);
 }
 productSel.addEventListener('change',()=>{sizeCounts={};renderSizes();recalcPrice();});
 qtyEl.addEventListener('input',recalcPrice);
 dueDateEl.addEventListener('change',recalcPrice);
-$('discType').addEventListener('change',recalcPrice);
-$('discAmt').addEventListener('input',recalcPrice);
 
 /* ── PAYMENT LINKS ── */
 function updatePayLinks(total){
@@ -648,47 +606,17 @@ function updatePayLinks(total){
 function saveOrder(){
   const prod=productSel.value, qty=parseInt(qtyEl.value)||0;
   if(!prod||!qty){showToast('Need product + quantity',true);return;}
-  const unit=getUnit(prod,qty), rush=isRush(), fu=rush?unit*(1+RUSH_MARKUP):unit;
-  let total=fu*qty;
-  const discType=$('discType').value, discAmt=parseFloat($('discAmt').value)||0;
-  let discOff=0;
-  if(discType==='pct' && discAmt>0){ discOff=total*(Math.min(discAmt,100)/100); }
-  else if(discType==='flat' && discAmt>0){ discOff=Math.min(discAmt,total); }
-  total=Math.max(0,total-discOff);
+  const unit=getUnit(prod,qty), rush=isRush(), fu=rush?unit*(1+RUSH_MARKUP):unit, total=fu*qty;
   const order={id:Date.now(),date:new Date().toISOString(),customer:$('custName').value||'—',
     phone:$('custPhone').value||'',email:$('custEmail').value||'',
     product:prod,qty,sizes:{...sizeCounts},dueDate:dueDateEl.value||'',
-    rush,unit:fu,discount:discOff,total,payStatus:$('payStatus').value,notes:$('notes').value||''};
+    rush,unit:fu,total,payStatus:$('payStatus').value,notes:$('notes').value||''};
   orders.unshift(order); persist(); renderOrders();
   syncSheets(order);
   if(order.email&&confirm('Send receipt to '+order.email+'?')) emailReceipt(order);
   showToast('Order saved ✓');
 }
 function persist(){ localStorage.setItem('v2p_orders',JSON.stringify(orders)); $('chipOrders').textContent=orders.length+' Orders Logged'; }
-
-/* ── VOICE REMINDERS ── */
-function saveReminder(text){
-  reminders.unshift({id:Date.now(),date:new Date().toISOString(),text:text.trim()});
-  persistReminders(); renderReminders();
-}
-function persistReminders(){ localStorage.setItem('v2p_reminders',JSON.stringify(reminders)); }
-function delReminder(id){ reminders=reminders.filter(r=>r.id!==id); persistReminders(); renderReminders(); }
-function renderReminders(){
-  const wrap=$('reminderList'), empty=$('reminderEmpty');
-  if(!reminders.length){ wrap.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  wrap.innerHTML=reminders.map(r=>`
-    <div class="order-card" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-        <div>
-          <div class="label-sm">${new Date(r.date).toLocaleString()}</div>
-          <div style="margin-top:4px">${r.text.replace(/</g,'&lt;')}</div>
-        </div>
-        <button class="icon-btn" onclick="delReminder(${r.id})">Delete</button>
-      </div>
-    </div>`).join('');
-}
-$('clearReminders').addEventListener('click',()=>{ if(!confirm('Clear ALL voice notes?')) return; reminders=[]; persistReminders(); renderReminders(); });
 
 function renderOrders(){
   const cards=$('orderCards'), body=$('ordersBody'), empty=$('emptyState'), tbl=$('ordersTbl');
@@ -734,15 +662,14 @@ $('saveOrder').addEventListener('click',saveOrder);
 $('clearForm').addEventListener('click',()=>{
   ['custName','custPhone','custEmail','qty','notes'].forEach(id=>$(id).value='');
   productSel.value=''; dueDateEl.value=''; $('payStatus').value='unpaid';
-  $('discType').value='none'; $('discAmt').value='0';
   sizeCounts={}; renderSizes(); recalcPrice();
   transcript.textContent='Waiting for your voice…'; transcript.classList.add('empty');
 });
 $('clearAll').addEventListener('click',()=>{ if(!confirm('Clear ALL orders?')) return; orders=[]; persist(); renderOrders(); });
 $('exportCsv').addEventListener('click',()=>{
   if(!orders.length){showToast('No orders');return;}
-  const hdrs=['Date','Customer','Phone','Product','Qty','Sizes','Due','Rush','UnitPrice','Discount','Total','PayStatus','Notes'];
-  const rows=orders.map(o=>[o.date,o.customer,o.phone,o.product,o.qty,Object.entries(o.sizes).map(([s,c])=>`${s}x${c}`).join(' '),o.dueDate,o.rush?'Yes':'No',o.unit.toFixed(2),(o.discount||0).toFixed(2),o.total.toFixed(2),o.payStatus,(o.notes||'').replace(/"/g,'""')]);
+  const hdrs=['Date','Customer','Phone','Product','Qty','Sizes','Due','Rush','UnitPrice','Total','PayStatus','Notes'];
+  const rows=orders.map(o=>[o.date,o.customer,o.phone,o.product,o.qty,Object.entries(o.sizes).map(([s,c])=>`${s}x${c}`).join(' '),o.dueDate,o.rush?'Yes':'No',o.unit.toFixed(2),o.total.toFixed(2),o.payStatus,(o.notes||'').replace(/"/g,'""')]);
   dl('v2p-orders.csv',[hdrs,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),'text/csv');
 });
 $('exportJson').addEventListener('click',()=>{ if(!orders.length){showToast('No orders');return;} dl('v2p-orders.json',JSON.stringify(orders,null,2),'application/json'); });
@@ -820,7 +747,7 @@ function showToast(msg,err){
 }
 
 /* ── INIT ── */
-renderOrders(); renderReminders(); recalcPrice(); updatePayLinks(0);
+renderOrders(); recalcPrice(); updatePayLinks(0);
 // Show Sheets status on load
 const ws=$('webhookStatus');
 if(settings.webhook){ws.className='sync-status ok';ws.textContent='✓ Connected to Google Sheets';}

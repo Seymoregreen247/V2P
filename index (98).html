@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport"/>
+<title>Voice to Pocket — Seymore Green</title>
+<meta content="Voice-powered order intake, instant pricing, payments, and order tracking for Seymore Green." name="description"/>
+<meta content="#0f0f0f" name="theme-color"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="Voice to Pocket" name="apple-mobile-web-app-title"/>
+<link href="manifest.json" rel="manifest"/>
+<link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="favicon-16.png" rel="icon" sizes="16x16" type="image/png"/>
+<link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&amp;family=JetBrains+Mono:wght@400;600&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#4BBB2A;--green-dark:#2d8a17;--dark:#0f0f0f;--panel:#1a1a1a;
+  --panel-2:#242424;--line:#2e2e2e;--text:#f2f2f2;--muted:#8a8a8a;
+  --amber:#ffb347;--red:#ff4d4d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--dark);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;-webkit-text-size-adjust:100%}
+body{
+  background:radial-gradient(circle at 15% 0%,rgba(75,187,42,.12),transparent 45%),
+             radial-gradient(circle at 90% 100%,rgba(75,187,42,.08),transparent 40%),var(--dark);
+  padding:16px 14px 80px;
+}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* HEADER */
+.hero{border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#141414 0%,#1c1c1c 100%);
+  padding:20px 16px 20px 16px;position:relative;overflow:hidden;margin-bottom:16px;}
+.hero::before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(75,187,42,.35),transparent 70%);filter:blur(30px);}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:8px;position:relative;}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,8vw,50px);line-height:.95;letter-spacing:-.02em;margin-bottom:8px;position:relative;}
+h1 .accent{color:var(--green)}
+.tagline{color:var(--muted);font-size:13px;line-height:1.5;position:relative;max-width:460px}
+.brand-stripe{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;position:relative;}
+.chip{border:1px solid var(--line);background:rgba(0,0,0,.3);padding:5px 11px;border-radius:999px;font-size:11px;color:#ccc;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;}
+.chip.on{border-color:var(--green);color:var(--green)}
+.gear-btn{position:absolute;top:16px;right:16px;width:48px;height:48px;background:rgba(75,187,42,.15);color:var(--green);
+  border:1px solid var(--green);border-radius:10px;font-size:18px;cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;z-index:5;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.gear-btn:active{background:var(--green);color:#000;transform:scale(.95)}
+
+/* LAYOUT */
+.grid{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:780px){.grid{grid-template-columns:1.1fr .9fr;gap:20px}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
+.panel h2{font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:-.01em;margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.panel h2 .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0;}
+.panel .sub{color:var(--muted);font-size:12px;margin-bottom:14px;line-height:1.5}
+
+/* MIC */
+.mic-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px;background:var(--panel-2);border-radius:14px;border:1px dashed #333;}
+.mic-btn{width:100px;height:100px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--green) 0%,var(--green-dark) 100%);
+  color:#000;font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:.5px;
+  box-shadow:0 12px 30px rgba(75,187,42,.35),inset 0 2px 0 rgba(255,255,255,.35);
+  transition:transform .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.mic-btn:active{transform:scale(.95)}
+.mic-btn.listening{background:linear-gradient(135deg,var(--red) 0%,#b22 100%);animation:pulse 1.2s ease-in-out infinite;color:#fff;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,77,77,.6),0 12px 30px rgba(255,77,77,.4)}50%{box-shadow:0 0 0 18px rgba(255,77,77,0),0 12px 30px rgba(255,77,77,.4)}}
+.transcript{width:100%;min-height:52px;background:#000;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green);line-height:1.5;word-break:break-word;}
+.transcript.empty{color:#555}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:460px){.form-grid{grid-template-columns:1fr 1fr}}
+label.lbl{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
+input,select,textarea{width:100%;background:#000;border:1px solid var(--line);color:var(--text);padding:13px 14px;border-radius:10px;font-family:inherit;font-size:16px;-webkit-appearance:none;appearance:none;touch-action:manipulation;transition:border .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green)}
+textarea{resize:vertical;min-height:70px;font-size:15px}
+select{background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 12px center;background-size:20px;padding-right:40px;}
+
+/* SIZE PICKER — PLUS / MINUS, NO RIGHT-CLICK */
+#sizesWrap{margin-top:16px}
+.size-row-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.size-hint{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.size-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
+.size-row{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#000;border:1px solid var(--line);border-radius:10px;padding:6px 8px;transition:border-color .15s;}
+.size-row.has-count{border-color:var(--green);background:rgba(75,187,42,.07)}
+.size-name{font-family:'JetBrains Mono',monospace;font-size:12px;color:#aaa;font-weight:600;flex:1;text-align:center;}
+.size-row.has-count .size-name{color:var(--green)}
+.size-controls{display:flex;align-items:center;gap:3px;}
+.sz-btn{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:#1a1a1a;cursor:pointer;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:all .12s;flex-shrink:0;line-height:1;}
+.sz-btn:active{transform:scale(.9);background:rgba(75,187,42,.12);border-color:var(--green);}
+.sz-btn.minus{color:#666;}
+.sz-btn.plus{color:var(--green);}
+.sz-count{min-width:26px;text-align:center;font-family:'Archivo Black',sans-serif;font-size:15px;color:var(--green);}
+.sz-count.zero{color:#333}
+
+/* PRICE BOX */
+.price-box{background:linear-gradient(135deg,#0a1f06 0%,#112a0a 100%);border:1px solid rgba(75,187,42,.4);border-radius:14px;padding:16px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;}
+.price-box .label-sm{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+.price-box .value{font-family:'Archivo Black',sans-serif;font-size:22px;color:var(--green);margin-top:3px;}
+.price-box .value.total{font-size:30px;color:#fff;text-shadow:0 0 10px rgba(75,187,42,.5)}
+.rush-flag{background:var(--amber);color:#000;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:1px;display:inline-block;margin-top:6px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+.rush-flag.hidden{display:none}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.btn{padding:0 18px;height:50px;border-radius:10px;border:none;cursor:pointer;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.5px;text-transform:uppercase;transition:all .12s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;min-width:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--green);color:#000;box-shadow:0 6px 16px rgba(75,187,42,.3)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+.btn-ghost:active{border-color:var(--green);color:var(--green)}
+
+/* PAYMENT */
+.pay-row{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px;}
+@media(min-width:380px){.pay-row{grid-template-columns:repeat(3,1fr)}}
+.pay-btn{height:58px;border-radius:12px;font-family:'Archivo Black',sans-serif;font-size:13px;text-align:center;cursor:pointer;border:none;color:#fff;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;letter-spacing:.5px;transition:transform .12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.pay-btn:active{transform:scale(.97)}
+.pay-venmo{background:#3d95ce}.pay-paypal{background:#0070ba}.pay-cashapp{background:#00d632;color:#000}
+.pay-btn small{display:block;font-family:'JetBrains Mono',monospace;font-weight:400;font-size:10px;opacity:.85;margin-top:2px;letter-spacing:.5px;}
+
+/* ORDER CARDS (mobile) */
+.orders-cards{display:flex;flex-direction:column;gap:10px;}
+@media(min-width:600px){.orders-cards{display:none}}
+.order-card{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px;}
+.order-card.is-paid{border-color:rgba(75,187,42,.4)}
+.ocard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.ocard-name{font-family:'Archivo Black',sans-serif;font-size:15px;}
+.ocard-total{font-family:'Archivo Black',sans-serif;font-size:18px;color:var(--green);}
+.ocard-meta{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;line-height:1.9;}
+.ocard-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+
+/* ORDER TABLE (desktop) */
+.orders-table-wrap{display:none;overflow-x:auto;}
+@media(min-width:600px){.orders-table-wrap{display:block}}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);}
+th{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);background:#111;}
+tr:hover{background:rgba(75,187,42,.04)}
+
+.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.5px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+.badge.paid{background:rgba(75,187,42,.18);color:var(--green);border:1px solid rgba(75,187,42,.4)}
+.badge.unpaid{background:rgba(255,77,77,.15);color:var(--red);border:1px solid rgba(255,77,77,.4)}
+.badge.deposit{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid rgba(255,179,71,.3)}
+.badge.rush{background:rgba(255,179,71,.15);color:var(--amber);border:1px solid rgba(255,179,71,.4)}
+
+.icon-btn{height:40px;padding:0 14px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;}
+.icon-btn:active{border-color:var(--green);color:var(--green)}
+.icon-btn.danger:active{border-color:var(--red);color:var(--red)}
+.empty-state{text-align:center;padding:32px;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;}
+
+/* SETTINGS MODAL */
+.settings-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+@media(min-width:460px){.settings-grid{grid-template-columns:1fr 1fr 1fr}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:20px 14px 60px;overflow-y:auto;backdrop-filter:blur(4px);}
+.modal-overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--green);border-radius:18px;padding:22px;max-width:580px;width:100%;margin:auto;}
+.modal h3{font-family:'Archivo Black',sans-serif;font-size:20px;margin-bottom:4px;}
+.modal .sub{color:var(--muted);font-size:12px;margin-bottom:16px;line-height:1.5}
+.modal-section{padding:14px 0;border-top:1px solid var(--line);}
+.modal-section:first-of-type{border-top:none;padding-top:0}
+.modal-section h4{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:10px;}
+.modal-close-row{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+.sync-status{display:inline-block;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:6px;}
+.sync-status.ok{background:rgba(75,187,42,.15);color:var(--green)}
+.sync-status.err{background:rgba(255,77,77,.15);color:var(--red)}
+.sync-status.idle{background:#1e1e1e;color:var(--muted)}
+
+/* TOAST — centered at bottom */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--green);color:#000;padding:12px 22px;border-radius:10px;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.5px;transition:transform .3s ease;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red);color:#fff}
+
+.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+details summary{cursor:pointer;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:10px 0;-webkit-tap-highlight-color:transparent;user-select:none;}
+.voice-note-row{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+.voice-note-row audio{width:100%;margin-top:8px}
+.voice-note-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.voice-note-actions button,.voice-note-actions a{font-size:12px;color:var(--green);background:none;border:0;cursor:pointer;text-decoration:underline}
+#noteStatus{font-size:12px;color:var(--muted);margin-top:9px}
+
+[hidden]{display:none!important}.grid{display:block}.workflow-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:20px 0 10px}.workflow-nav .btn{white-space:normal;min-height:62px;font-size:14px;padding:10px 5px}.workflow-nav .active{background:var(--green);color:#000}#workflowHelp{margin-bottom:14px}.workflow-lane{max-width:900px;margin:auto}#micBtn{min-width:150px}#contactsPanel .btn-row{flex-wrap:wrap}</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<div class="eyebrow">Seymore Green • Your Pocket Secretary</div>
+<h1>Voice to <span class="accent">Pocket.</span></h1>
+<p class="tagline">Choose a task. Tap the mic. Talk. Check. Save.</p>
+<div class="brand-stripe">
+<span class="chip on" id="chipMic">● Mic Ready</span>
+<span class="chip" id="chipOrders">0 Orders Logged</span>
+<span class="chip" id="chipSync">● Sheets Off</span>
+<span class="chip">21 Years Self-Employed</span>
+</div>
+<button class="gear-btn" id="openSettings" title="Settings">⚙</button>
+</div>
+<nav aria-label="Choose a task" class="workflow-nav"><button class="btn" id="laneContact">👤 New Contact</button><button class="btn" id="laneOrder">🛍 Take an Order</button><button class="btn" id="laneNote">🎙 Notes</button></nav><p class="sub" id="workflowHelp" role="status"></p><div class="panel">
+<h2><span class="dot"></span>Speak Your Contact </h2>
+<p class="sub">Choose Order, Voice Note, Reminder or Contact. Tap the mic, speak, then tap STOP. Pauses no longer finish your session. Keep the app open and your screen awake.</p>
+<div class="mic-wrap">
+<button class="mic-btn" id="micBtn">TAP TO TALK</button>
+<div class="transcript empty" id="transcript">Waiting for your voice…</div>
+</div>
+</div><div class="grid"><section class="workflow-lane" id="lane-contact"><div class="panel" id="contactsPanel">
+<h2><span class="dot"></span>Client Contacts <span id="contactCount" style="margin-left:auto;font-size:12px">0 saved</span></h2>
+<p class="sub">Say “New contact. Name John Smith. Phone 617 555 0123. Email john at example dot com.” Check the details, then save. Contacts stay on this device; export a backup regularly.</p>
+<div class="btn-row"><button class="btn btn-primary" id="scanBusinessCard">📷 Scan Business Card</button></div>
+<input id="businessCardFile" type="file" accept="image/*" capture="environment" hidden>
+<div id="businessCardPanel" hidden style="border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0">
+<p style="font-size:13px">Take a clear photo with the card filling the frame. Reading happens on this device; internet is needed to load the reader.</p>
+<img id="businessCardPreview" alt="Business card to read" style="display:none;width:100%;max-height:260px;object-fit:contain;margin:12px 0">
+<p id="businessCardStatus" role="status" aria-live="polite">Ready to scan.</p>
+<div class="btn-row"><button class="btn btn-ghost" id="businessCardRotate">Rotate &amp; Read Again</button><button class="btn btn-ghost" id="businessCardCancel" disabled>Cancel Reading</button><button class="btn btn-ghost" id="businessCardClose">Close</button></div>
+<details><summary style="cursor:pointer;padding:12px 0">See the words read from the card</summary><textarea id="businessCardText" aria-label="Business card text" placeholder="Recognized text appears here. You can correct it and fill the contact again."></textarea><button class="btn btn-ghost" id="businessCardApply">Fill Contact from Text</button></details></div>
+<div class="btn-row"><button class="btn btn-primary" hidden="" id="contactMic" style="display:none">🎙 Dictate Contact</button><button class="btn btn-ghost" id="contactNew">Clear / New Contact</button></div>
+
+
+<details><summary>View or correct original dictation</summary><textarea aria-label="Contact dictation" id="contactTranscript" placeholder="Spoken contact details appear here. Edit and tap Extract if needed."></textarea><button class="btn btn-ghost" id="contactExtract">Extract Details</button></details><div class="form-grid">
+<div><label class="lbl" for="contactName">Name</label><input autocomplete="name" id="contactName"/></div>
+<div><label class="lbl" for="contactPhone">Phone</label><input autocomplete="tel" id="contactPhone" type="tel"/></div>
+<div><label class="lbl" for="contactEmail">Email</label><input autocomplete="email" id="contactEmail" type="email"/></div>
+</div>
+<details id="contactBusinessDetails" style="margin:12px 0"><summary style="cursor:pointer;padding:8px 0">Company, website &amp; address</summary><label class="lbl" for="contactCompany">Company</label><input id="contactCompany" autocomplete="organization"><label class="lbl" for="contactWebsite">Website</label><input id="contactWebsite" type="url" inputmode="url"><label class="lbl" for="contactAddress">Address</label><textarea id="contactAddress" autocomplete="street-address"></textarea></details>
+<label class="lbl" for="contactNotes">Client notes</label><textarea id="contactNotes" placeholder="Company, preferences, or follow-up details"></textarea>
+<label style="display:flex;align-items:center;gap:10px;margin:14px 0;font-size:14px"><input type="checkbox" id="contactAutoSave" style="width:22px;height:22px">Auto-save complete contact when I tap STOP or say “save contact”</label><p style="font-size:12px;color:var(--muted)">Check the details as you speak. Phone must be complete; email is checked if supplied. Correct saved details anytime.</p>
+<div id="contactFollowup" hidden style="border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0"><strong id="contactFollowupName">Contact saved</strong><p style="font-size:13px;margin:8px 0">Your introduction is ready. Open the draft, review, then tap Send.</p><textarea id="contactIntroMessage" aria-label="Introduction message" rows="4"></textarea><div class="btn-row"><button class="btn btn-primary" id="contactAutoText">Auto Text · Open Draft</button><button class="btn btn-ghost" id="contactAutoEmail">Email Introduction</button></div></div>
+<div class="btn-row"><button class="btn btn-primary" id="contactSave">Save Contact</button><button class="btn btn-ghost" id="contactUse">Use in Order</button><button class="btn btn-ghost" id="contactEmailNow">Email Now</button></div>
+<p id="contactStatus" role="status">Review phone numbers and spelling before saving.</p>
+<input aria-label="Search contacts" id="contactSearch" placeholder="Search name, phone, email or notes…" type="search"/>
+
+<div id="contactList"></div><details><summary>Export contacts &amp; backup</summary><div class="btn-row"><button class="btn btn-primary" id="contactExportCsv">Export CSV</button><button class="btn btn-ghost" id="contactExport">Download Backup (JSON)</button><button class="btn btn-ghost" id="contactImport">Import Backup</button><input accept="application/json,.json" hidden="" id="contactImportFile" type="file"/></div></details></div></section><section class="workflow-lane" id="lane-order"><div class="panel">
+<h2><span class="dot"></span>Order Details</h2>
+<p class="sub">Voice auto-fills fields. Adjust anything manually below.</p>
+<div class="form-grid">
+<div>
+<label class="lbl">Customer Name</label>
+<input autocomplete="off" id="custName" placeholder="Who's buying?"/>
+</div>
+<div>
+<label class="lbl">Phone / Contact</label>
+<input id="custPhone" inputmode="tel" placeholder="Phone or handle"/>
+</div>
+<div>
+<label class="lbl">Customer Email</label>
+<input id="custEmail" inputmode="email" placeholder="for receipt" type="email"/>
+</div>
+<div>
+<label class="lbl">Product</label>
+<select id="product">
+<option value="">— Select product —</option>
+<option value="shirts">T-Shirts</option>
+<option value="hoodies">Hoodies</option>
+<option value="buttons">Buttons</option>
+<option value="stickers">Stickers</option>
+<option value="businesscards">Business Cards</option>
+<option value="flyers">Flyers</option>
+<option value="postcards">Postcards</option>
+<option value="mugs">Mugs</option>
+<option value="hats">Hats</option>
+<option value="banners">Banners</option>
+<option value="yardsigns">Yard Signs</option>
+<option value="cbd">CBD / THCA Product</option>
+</select>
+</div>
+<div>
+<label class="lbl">Quantity</label>
+<input id="qty" inputmode="numeric" min="1" placeholder="How many?" type="number"/>
+</div>
+</div>
+<!-- SIZES — TAP + and - BUTTONS ONLY -->
+<div style="border:1px solid var(--green);border-radius:12px;padding:14px;margin:16px 0">
+<label style="display:flex;gap:12px;align-items:center;font-weight:bold"><input id="businessSpecial" type="checkbox" style="width:24px;height:24px">Business Shirt Specials</label>
+<label class="lbl" for="specialTier" style="margin-top:12px">Choose the business deal</label><select id="specialTier"><option value="24">24+ shirts — $18 each / $432 for 24 S–XL</option><option value="12">12+ shirts — $21 each / $252 for 12 S–XL</option></select>
+<p class="sub" style="margin-top:8px">Businesses only · One-color print, front &amp; back.<br>24+ deal: S–XL $18 · 2XL $20 · 3XL $22.<br>12+ deal: S–XL $21 · 2XL $23 · 3XL $25.</p>
+<p id="specialStatus" role="status" style="font-size:13px">OFF — Regular pricing applies.</p></div>
+<div id="sizesWrap" style="display:none;margin-top:16px">
+<div class="size-row-label">
+<label class="lbl" style="margin-bottom:0">Sizes</label>
+<span class="size-hint">tap + / − per size</span>
+</div>
+<div class="size-grid" id="sizeGrid"></div>
+</div>
+<div class="form-grid" style="margin-top:14px">
+<div>
+<label class="lbl">Due Date</label>
+<input id="dueDate" type="date"/>
+</div>
+<div>
+<label class="lbl">Payment Status</label>
+<select id="payStatus">
+<option value="unpaid">Unpaid</option>
+<option value="paid">Paid</option>
+<option value="deposit">Deposit Taken</option>
+</select>
+</div>
+</div>
+<div style="margin-top:14px">
+<label class="lbl">Notes</label>
+<textarea id="notes" placeholder="Color, artwork, pickup/delivery, special instructions…"></textarea>
+</div>
+<div class="price-box">
+<div>
+<div class="label-sm">Unit Price</div>
+<div class="value" id="unitPrice">$0.00</div>
+<div class="rush-flag hidden" id="rushFlag">⚡ RUSH +25%</div>
+</div>
+<div>
+<div class="label-sm">Order Total</div>
+<div class="value total" id="totalPrice">$0.00</div>
+</div>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" id="saveOrder">💾 Save Order</button>
+<button class="btn btn-ghost" id="clearForm">Clear</button>
+</div>
+</div><div class="panel">
+<h2><span class="dot"></span>Collect Payment</h2>
+<p class="sub">Tap to open your payment app with the total pre-filled.</p>
+<div class="pay-row">
+<a class="pay-btn pay-venmo" href="#" id="payVenmo" rel="noopener" target="_blank">VENMO<small id="venmoHandle">@Seymoregreen</small></a>
+<a class="pay-btn pay-paypal" href="#" id="payPaypal" rel="noopener" target="_blank">PAYPAL<small id="paypalHandle">sales@seymoregreen.com</small></a>
+<a class="pay-btn pay-cashapp" href="#" id="payCashapp" rel="noopener" target="_blank">CASH APP<small id="cashappHandle">$SeymoreGreen</small></a>
+</div>
+<details style="margin-top:12px">
+<summary>Payment Handles — Edit</summary>
+<div class="settings-grid" style="margin-top:10px">
+<div><label class="lbl">Venmo</label><input id="setVenmo" placeholder="Seymoregreen"/></div>
+<div><label class="lbl">PayPal</label><input id="setPaypal" placeholder="sales@seymoregreen.com"/></div>
+<div><label class="lbl">Cash App</label><input id="setCashapp" placeholder="SeymoreGreen"/></div>
+</div>
+<button class="btn btn-ghost" id="saveHandles" style="margin-top:10px">Save Handles</button>
+</details>
+</div><div class="panel">
+<h2><span class="dot"></span>Order Log</h2>
+<p class="sub">All saved orders. Tap to toggle paid. Export any time.</p>
+<div class="btn-row" style="margin-top:0;margin-bottom:14px">
+<button class="btn btn-ghost" id="exportCsv">CSV</button>
+<button class="btn btn-ghost" id="exportJson">JSON</button>
+<button class="btn btn-ghost" id="clearAll" style="margin-left:auto;color:var(--red)">Clear All</button>
+</div>
+<!-- Mobile cards -->
+<div class="orders-cards" id="orderCards"></div>
+<!-- Desktop table -->
+<div class="orders-table-wrap">
+<table id="ordersTbl" style="display:none">
+<thead><tr><th>Date</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Status</th><th></th></tr></thead>
+<tbody id="ordersBody"></tbody>
+</table>
+</div>
+<div class="empty-state" id="emptyState">No orders yet. Speak your first one.</div>
+</div></section><section class="workflow-lane" id="lane-note"><div class="panel" id="spokenReminderPanel">
+<h2><span class="dot"></span>Notes <span id="spokenCount" style="font-size:12px;color:var(--muted);margin-left:auto">0 saved</span></h2>
+<p class="sub">Tap the microphone above and speak your note or reminder. Check the words below, then Save Note. Your existing notes and reminders stay here.</p>
+<div class="btn-row"><button class="btn btn-ghost" hidden="" id="modeOrder" style="display:none">Order</button><button class="btn btn-ghost" hidden="" id="modeNote" style="display:none">Voice Note</button><button class="btn btn-ghost" hidden="" id="modeReminder" style="display:none">Reminder</button><button class="btn btn-ghost" hidden="" id="modeContact" style="display:none">Contact</button></div>
+<p hidden="" id="captureModeStatus" style="font-size:12px;color:var(--muted);margin-top:8px">Mode: Order</p>
+<textarea aria-label="Spoken note or reminder" id="spokenDraft" placeholder="Your note appears here. You can also type."></textarea>
+<div class="btn-row"><button class="btn btn-primary" id="saveSpoken">Save Note</button></div>
+<div id="spokenList"></div>
+<details><summary>Record audio instead — keep your actual voice</summary><div class="panel">
+<h2><span class="dot"></span>Audio Recordings <span id="noteCount" style="font-size:12px;color:var(--muted);margin-left:auto">0 saved</span></h2>
+<p class="sub">Record as many separate notes as your device has room for. Each stays saved on this device until you delete it.</p>
+<input aria-label="Voice note title" id="noteTitle" placeholder="Recording title (optional)"/>
+<div class="btn-row"><button class="btn btn-primary" id="noteRecord">🎙 Record Note</button><button class="btn btn-ghost" disabled="" id="noteStop">Stop &amp; Save</button></div>
+<div id="noteStatus" role="status">Ready to record.</div>
+<div id="voiceNoteList"></div>
+</div></details></div></section></div>
+<div class="footer">SEYMORE GREEN • VOICE TO POCKET v5.0</div>
+</div>
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+<div class="modal">
+<h3>⚙ Settings</h3>
+<p class="sub">Google Sheets sync, payment handles, and business info — all stored on this device.</p>
+<div class="modal-section">
+<h4>Google Sheets Webhook</h4>
+<p class="sub" style="margin-bottom:10px">Your Apps Script URL. Every saved order posts automatically.</p>
+<input id="setWebhook" placeholder="https://script.google.com/macros/s/..../exec"/>
+<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+<button class="btn btn-primary" id="saveWebhook">Save URL</button>
+<button class="btn btn-ghost" id="testWebhook">Test</button>
+</div>
+<div class="sync-status idle" id="webhookStatus">Checking…</div>
+</div>
+<div class="modal-section">
+<h4>Payment Handles</h4>
+<div class="settings-grid">
+<div><label class="lbl">Venmo</label><input id="setVenmoModal" placeholder="Seymoregreen"/></div>
+<div><label class="lbl">PayPal</label><input id="setPaypalModal" placeholder="sales@seymoregreen.com"/></div>
+<div><label class="lbl">Cash App</label><input id="setCashappModal" placeholder="SeymoreGreen"/></div>
+</div>
+</div>
+<div class="modal-section">
+<h4>Business Info</h4>
+<div class="settings-grid" style="grid-template-columns:1fr 1fr">
+<div><label class="lbl">Business Name</label><input id="setBizName" placeholder="Seymore Green"/></div>
+<div><label class="lbl">Business Email</label><input id="setBizEmail" placeholder="sales@seymoregreen.com"/></div>
+</div>
+</div>
+<div class="modal-close-row">
+<button class="btn btn-primary" id="saveAllSettings">Save All</button>
+<button class="btn btn-ghost" id="closeSettings">Close</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast">Saved ✓</div>
+<script>
+/* ── PRICING ── */
+const PRICING = {
+  shirts:       [{min:500,p:12.99},{min:100,p:14.99},{min:50,p:17.99},{min:25,p:20.99},{min:10,p:24.99},{min:6,p:27.99},{min:1,p:30.00}],
+  hoodies:      [{min:500,p:24.99},{min:100,p:27.99},{min:50,p:32.99},{min:25,p:36.99},{min:10,p:42.99},{min:6,p:47.99},{min:1,p:55.00}],
+  buttons:      [{min:100,p:1.50},{min:50,p:2.00},{min:25,p:2.50},{min:10,p:3.00},{min:1,p:4.00}],
+  stickers:     [{min:100,p:1.50},{min:50,p:2.00},{min:25,p:2.50},{min:10,p:3.00},{min:1,p:4.00}],
+  businesscards:[{min:1000,p:0.10},{min:500,p:0.15},{min:250,p:0.20},{min:100,p:0.30},{min:1,p:0.50}],
+  flyers:       [{min:500,p:0.75},{min:250,p:1.00},{min:100,p:1.25},{min:50,p:1.75},{min:1,p:2.50}],
+  postcards:    [{min:500,p:0.65},{min:250,p:0.85},{min:100,p:1.10},{min:50,p:1.50},{min:1,p:2.00}],
+  mugs:         [{min:100,p:8.99},{min:50,p:10.99},{min:25,p:12.99},{min:10,p:14.99},{min:1,p:17.99}],
+  hats:         [{min:100,p:15.99},{min:50,p:18.99},{min:25,p:21.99},{min:10,p:24.99},{min:1,p:27.99}],
+  banners:      [{min:10,p:35.00},{min:5,p:45.00},{min:1,p:55.00}],
+  yardsigns:    [{min:50,p:8.99},{min:25,p:10.99},{min:10,p:12.99},{min:1,p:15.99}],
+  cbd:          [{min:1,p:0}]
+};
+const SIZES_APPAREL = ['YXS','YS','YM','YL','YXL','XS','S','M','L','XL','2XL','3XL','4XL','5XL'];
+const SIZES_HATS    = ['Adj','S/M','L/XL'];
+const SIZE_MAP      = {shirts:SIZES_APPAREL, hoodies:SIZES_APPAREL, hats:SIZES_HATS};
+const RUSH_MARKUP   = 0.25;
+const RUSH_DAYS     = 3;
+const WEBHOOK_URL   = 'https://script.google.com/macros/s/AKfycbzUyz0Szux6GtyBd6qYTlNqRcy_4bhRP_g541neyOE4lYGpC1llereCmchgPIZ8m9GYlA/exec';
+
+/* ── STATE ── */
+let orders    = JSON.parse(localStorage.getItem('v2p_orders') || '[]');
+let sizeCounts = {};
+let handles   = JSON.parse(localStorage.getItem('v2p_handles') || '{}');
+handles.venmo   = handles.venmo   || 'Seymoregreen';
+handles.paypal  = handles.paypal  || 'sales@seymoregreen.com';
+handles.cashapp = handles.cashapp || 'SeymoreGreen';
+let settings  = JSON.parse(localStorage.getItem('v2p_settings') || '{}');
+settings.webhook  = settings.webhook  || WEBHOOK_URL;
+settings.bizName  = settings.bizName  || 'Seymore Green';
+settings.bizEmail = settings.bizEmail || 'sales@seymoregreen.com';
+
+
+function showLane(mode){
+ const lane=mode==='contact'?'contact':mode==='order'?'order':'note';
+ for(const name of ['contact','order','note']){document.getElementById('lane-'+name).hidden=name!==lane;const button=document.getElementById('lane'+name[0].toUpperCase()+name.slice(1));button.classList.toggle('active',name===lane);button.setAttribute('aria-pressed',String(name===lane));}
+ const title={contact:'Speak Your Contact',order:'Speak Your Order',note:'Speak Your Note'}[lane];
+ document.querySelector('#micBtn').closest('.panel').querySelector('h2').lastChild.textContent=title;
+ document.querySelector('#micBtn').closest('.panel').querySelector('.sub').textContent={contact:'Say: “Name Stacy Adams. Phone 617 555 0123. Email stacy at example dot com.” Tap STOP, check the details, then Save Contact.',order:'Say: “Twelve shirts.” Tap STOP, check the order form below, then save the order.',note:'Say anything you need to remember. Tap STOP, check your words, then Save Note.'}[lane];
+ document.getElementById('workflowHelp').textContent={contact:'1. Speak their details → 2. Check and save → 3. Text, email, or start an order.',order:'1. Add the customer → 2. Speak the items → 3. Check, save, and collect payment.',note:'One place for notes and reminders. Use audio recording below if you want to keep your actual voice.'}[lane];
+}
+
+/* ── SPOKEN NOTES AND REMINDERS ── */
+let captureMode='order';
+const SPOKEN_KEY='v2p_spoken_notes_v1';
+function getSpoken(){try{return JSON.parse(localStorage.getItem(SPOKEN_KEY)||'[]')}catch{return []}}
+function setCaptureMode(mode){
+  if(mode==='reminder')mode='note';
+  captureMode=mode;
+  showLane(mode);
+  document.getElementById('captureModeStatus').textContent='Mode: '+({order:'Order',note:'Voice Note',reminder:'Reminder',contact:'Contact'}[mode]);
+  for(const [id,value] of [['modeOrder','order'],['modeNote','note'],['modeReminder','reminder'],['modeContact','contact']])
+    document.getElementById(id).classList.toggle('btn-primary',mode===value);
+}
+for(const [id,mode] of [['modeOrder','order'],['modeNote','note'],['modeReminder','reminder'],['modeContact','contact']])
+  document.getElementById(id).onclick=()=>setCaptureMode(mode);
+function renderSpoken(){
+  const notes=getSpoken(), list=document.getElementById('spokenList');list.replaceChildren();
+  document.getElementById('spokenCount').textContent=notes.length+' saved';
+  notes.slice().reverse().forEach(n=>{
+    const row=document.createElement('div');row.className='voice-note-row';
+    const title=document.createElement('strong');title.textContent='Note';
+    const date=document.createElement('small');date.style.cssText='display:block;color:var(--muted)';date.textContent=new Date(n.date).toLocaleString();
+    const body=document.createElement('p');body.textContent=n.text;body.style.margin='8px 0';
+    const del=document.createElement('button');del.className='icon-btn danger';del.textContent='Delete';
+    del.onclick=()=>{if(!confirm('Delete this entry?'))return;localStorage.setItem(SPOKEN_KEY,JSON.stringify(getSpoken().filter(x=>x.id!==n.id)));renderSpoken()};
+    row.append(title,date,body,del);list.append(row);
+  });
+  if(!notes.length)list.textContent='No spoken notes or reminders saved yet.';
+}
+document.getElementById('saveSpoken').onclick=()=>{
+  const input=document.getElementById('spokenDraft'), value=input.value.trim();
+  if(!value){showToast('Speak or type a note first',true);return}
+  const type=captureMode==='reminder'?'reminder':'note';
+  const notes=getSpoken();notes.push({id:Date.now()+Math.random(),type,text:value,date:new Date().toISOString()});
+  try{localStorage.setItem(SPOKEN_KEY,JSON.stringify(notes))}catch(e){showToast('Device storage full — could not save',true);return}
+  input.value='';renderSpoken();showToast('Saved '+type+' ✓');
+};
+function handleSpoken(text){
+  if(/^(?:new |add )?contact\b/i.test(text)){if(captureMode!=='contact'||/^(?:new|add)\s+contact\b/i.test(text))clearContact();setCaptureMode('contact');text=text.replace(/^(?:new |add )?contact[\s.:,-]*/i,'');}
+  if(captureMode==='contact'){
+    const save=text.match(/\b(?:save\s+contact|just\s+save|save)[.!]?\s*$/i);
+    if(save){const details=text.slice(0,save.index).trim();if(details)handleSpoken(details);contactSaveOnEnd=true;stopListening();if(recognition)recognition.stop();else{contactSaveOnEnd=false;saveCompleteContact();}return true;}
+  }
+  if(captureMode==='contact'){hideContactFollowup();const el=document.getElementById('contactTranscript');el.value+=(el.value?' ':'')+text;extractContact(el.value);return true;}
+  const match=text.match(/^(?:say\s+)?(voice\s*note|reminder)\b[\s,:-]*(.*)$/i);
+  if(match){
+    setCaptureMode(/^reminder/i.test(match[1])?'reminder':'note');
+    if(match[2]){const d=document.getElementById('spokenDraft');d.value+=(d.value?' ':'')+match[2];}
+    else showToast('Mode selected — tap mic and speak your message');
+    return true;
+  }
+  if(captureMode!=='order'){
+    const draft=document.getElementById('spokenDraft');draft.value+=(draft.value?' ':'')+text;
+    return true;
+  }
+  return false;
+}
+setCaptureMode('order');renderSpoken();
+
+/* ── SAVED VOICE NOTES ── */
+const noteDbReady = new Promise((resolve,reject)=>{
+  const req=indexedDB.open('v2p_voice_notes',1);
+  req.onupgradeneeded=()=>req.result.createObjectStore('notes',{keyPath:'id',autoIncrement:true});
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
+});
+let noteRecorder=null, noteStream=null, noteChunks=[], noteTicker=null, noteStarted=0;
+const noteStatus=document.getElementById('noteStatus');
+function noteRequest(mode,operation){
+  return noteDbReady.then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction('notes',mode), req=operation(tx.objectStore('notes'));
+    req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error);
+  }));
+}
+async function renderVoiceNotes(){
+  const list=document.getElementById('voiceNoteList');
+  list.querySelectorAll('audio').forEach(a=>{if(a.dataset.url) URL.revokeObjectURL(a.dataset.url)});
+  const notes=(await noteRequest('readonly',store=>store.getAll())).reverse();
+  document.getElementById('noteCount').textContent=`${notes.length} saved`;
+  list.replaceChildren();
+  for(const note of notes){
+    const row=document.createElement('div'); row.className='voice-note-row';
+    const title=document.createElement('strong'); title.textContent=note.title||'Voice reminder';
+    const date=document.createElement('div'); date.style.cssText='font-size:11px;color:var(--muted);margin-top:3px'; date.textContent=new Date(note.date).toLocaleString();
+    const audio=document.createElement('audio'); audio.controls=true; audio.preload='none';
+    const url=URL.createObjectURL(note.blob); audio.src=url; audio.dataset.url=url;
+    const actions=document.createElement('div'); actions.className='voice-note-actions';
+    const download=document.createElement('a'); download.href=url; download.download=`voice-note-${note.id}.webm`; download.textContent='Download';
+    const remove=document.createElement('button'); remove.type='button'; remove.textContent='Delete';
+    remove.onclick=async()=>{if(!confirm('Delete this voice note?'))return; await noteRequest('readwrite',store=>store.delete(note.id)); renderVoiceNotes();};
+    actions.append(download,remove);row.append(title,date,audio,actions);list.append(row);
+  }
+  if(!notes.length) list.textContent='No voice notes saved yet.';
+}
+document.getElementById('noteRecord').onclick=async()=>{
+  try{
+    if(!window.MediaRecorder) throw Error('Recording is unavailable in this browser.');
+    noteStream=await navigator.mediaDevices.getUserMedia({audio:true}); noteChunks=[];
+    noteRecorder=new MediaRecorder(noteStream);
+    noteRecorder.ondataavailable=e=>{if(e.data.size)noteChunks.push(e.data)};
+    noteRecorder.onerror=()=>{noteStatus.textContent='Recording error. Try again.'};
+    noteRecorder.onstop=async()=>{
+      clearInterval(noteTicker);noteStream.getTracks().forEach(t=>t.stop());
+      try{
+        const blob=new Blob(noteChunks,{type:noteRecorder.mimeType||'audio/webm'});
+        if(!blob.size)throw Error('No audio was captured.');
+        await noteRequest('readwrite',store=>store.add({title:document.getElementById('noteTitle').value.trim(),date:new Date().toISOString(),blob}));
+        document.getElementById('noteTitle').value=''; noteStatus.textContent='Voice note saved on this device.';
+        await renderVoiceNotes();
+      }catch(e){noteStatus.textContent='Could not save note: '+e.message}
+      document.getElementById('noteRecord').disabled=false; document.getElementById('noteStop').disabled=true;
+    };
+    noteRecorder.start(1000); noteStarted=Date.now();
+    const tick=()=>{const sec=Math.floor((Date.now()-noteStarted)/1000);noteStatus.textContent='Recording '+Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')+' — tap Stop & Save. Keep this app open.'};tick();noteTicker=setInterval(tick,1000);
+    document.getElementById('noteRecord').disabled=true; document.getElementById('noteStop').disabled=false;
+  }catch(e){if(noteStream)noteStream.getTracks().forEach(t=>t.stop());noteStatus.textContent='Microphone unavailable: '+e.message}
+};
+document.getElementById('noteStop').onclick=()=>{if(noteRecorder?.state==='recording')noteRecorder.stop()};
+renderVoiceNotes().catch(e=>{noteStatus.textContent='Saved notes unavailable: '+e.message});
+
+/* ── DOM ── */
+const $ = id => document.getElementById(id);
+const micBtn    = $('micBtn'),  transcript = $('transcript');
+const productSel= $('product'), qtyEl = $('qty'), dueDateEl = $('dueDate');
+const sizesWrap = $('sizesWrap'), sizeGrid = $('sizeGrid');
+const unitPriceEl = $('unitPrice'), totalPriceEl = $('totalPrice'), rushFlag = $('rushFlag');
+
+/* ── VOICE ── */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null, isListening = false, restartTimer=null, sessionWords="", contactSaveOnEnd=false;
+
+// Human-readable mic error messages
+const MIC_ERRORS = {
+  'not-allowed':   '🚫 Mic blocked — tap the 🔒 in your address bar and allow microphone, then reload.',
+  'network':       '📡 Network error — Chrome needs internet to process speech. Check your connection.',
+  'no-speech':     '🤫 No speech detected — speak louder or closer to your mic.',
+  'audio-capture': '🎤 No microphone found — check that your device has a mic and it\'s not in use.',
+  'aborted':       'Mic stopped — tap again to retry.',
+  'service-not-allowed': '🚫 Mic blocked — this page must be on HTTPS. Open it via your Netlify link, not a local file.'
+};
+
+if (SpeechRec) {
+  recognition = new SpeechRec();
+  recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+  recognition.onresult = e => {
+    let interim='', final='';
+    for (let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    const text=(final||interim).trim();
+    if(final) sessionWords+=(sessionWords?' ':'')+final.trim();
+    transcript.textContent=(sessionWords+' '+interim).trim()||'...'; transcript.classList.remove('empty');
+    if(final && !handleSpoken(final)) parseVoice(final);
+  };
+  recognition.onerror = e=>{contactSaveOnEnd=false;
+    const msg = MIC_ERRORS[e.error] || ('Mic error: ' + e.error + ' — try reloading.');
+    transcript.textContent = msg;
+    transcript.classList.remove('empty');
+    if(!['no-speech','aborted'].includes(e.error))stopListening();
+  };
+  recognition.onend = ()=>{if(!isListening&&contactSaveOnEnd){contactSaveOnEnd=false;saveCompleteContact();}if(isListening){clearTimeout(restartTimer);restartTimer=setTimeout(()=>{if(isListening){try{recognition.start()}catch(e){stopListening();transcript.textContent+=' — Tap mic to resume.'}}},350);}};
+} else {
+  $('chipMic').textContent='✕ No Mic'; $('chipMic').classList.remove('on');
+  micBtn.disabled=true; micBtn.textContent='CHROME ONLY';
+  transcript.textContent='Open in Chrome or Edge for voice support.';
+}
+
+async function startListening(){
+  if(!recognition) return;
+  // Step 1: Check for HTTPS / localhost (Chrome Speech API requires it)
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if(!isSecure){
+    transcript.textContent = '🚫 Voice needs HTTPS — open this app via your Netlify link, not a local file.';
+    transcript.classList.remove('empty');
+    showToast('Open via Netlify for voice ⚠', true);
+    return;
+  }
+  // Step 2: Explicitly request mic permission first — this triggers the browser dialog
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(t => t.stop()); // release immediately — just needed the permission grant
+  } catch(permErr){
+    transcript.textContent = '🚫 Mic permission denied — tap the 🔒 in your address bar → allow microphone → reload.';
+    transcript.classList.remove('empty');
+    showToast('Allow mic in browser settings', true);
+    return;
+  }
+  // Step 3: Start speech recognition
+  try{
+    sessionWords='';recognition.start();
+    isListening=true;
+    micBtn.classList.add('listening');
+    micBtn.textContent='STOP LISTENING';
+    transcript.textContent=captureMode==='contact'?'Say the name, phone number, and email.':captureMode==='note'?'Speak your note.':'Speak the items for this order.';
+    transcript.classList.remove('empty');
+  } catch(e){
+    // Happens if recognition.start() is called while already running
+    if(e.name === 'InvalidStateError'){
+      stopListening();recognition.stop();
+      transcript.textContent='Microphone is finishing. Tap again to resume.';
+    } else {
+      transcript.textContent = 'Could not start mic: ' + e.message;
+      transcript.classList.remove('empty');
+    }
+  }
+}
+function stopListening(){ clearTimeout(restartTimer);isListening=false; micBtn.classList.remove('listening'); micBtn.textContent='TAP TO TALK'; }
+micBtn.addEventListener('click',()=>{ if(isListening){contactSaveOnEnd=captureMode==='contact'&&$('contactAutoSave').checked;stopListening();recognition&&recognition.stop();}else startListening(); });
+
+/* ── PARSE VOICE ── */
+const WORD_NUM = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,dozen:12,'a dozen':12,hundred:100};
+const PROD_MAP = [
+  {key:'hoodies',words:['hoodie','hoody','hoodies','sweatshirt','sweatshirts','pullover']},
+  {key:'shirts', words:['shirt','shirts','tshirt','tshirts','t-shirt','t-shirts','tee','tees']},
+  {key:'buttons',words:['button','buttons','pin','pins']},
+  {key:'stickers',words:['sticker','stickers','decal','decals']},
+  {key:'businesscards',words:['business card','business cards','bizcard']},
+  {key:'flyers',words:['flyer','flyers','flier']},
+  {key:'postcards',words:['postcard','postcards']},
+  {key:'mugs',words:['mug','mugs','cup','cups']},
+  {key:'hats',words:['hat','hats','cap','caps','beanie','beanies']},
+  {key:'banners',words:['banner','banners']},
+  {key:'yardsigns',words:['yard sign','yard signs','lawn sign']},
+  {key:'cbd',words:['cbd','thca','thc','gummies','flower','pre-roll','vape','vapes','cart','carts']}
+];
+const SZ_WORDS = {'xs':'XS','extra small':'XS','small':'S','medium':'M','med':'M','large':'L','extra large':'XL','xl':'XL','x-large':'XL','2xl':'2XL','2x':'2XL','xxl':'2XL','double xl':'2XL','3xl':'3XL','3x':'3XL','4xl':'4XL','4x':'4XL','5xl':'5XL','5x':'5XL'};
+function parseVoice(text){
+  const t=text.toLowerCase();
+  let qty=null;
+  const dm=t.match(/(\d+)/); if(dm) qty=parseInt(dm[1]);
+  else { for(const w in WORD_NUM){ if(new RegExp('\\b'+w+'\\b').test(t)){qty=WORD_NUM[w];break;} } }
+  let prod=null;
+  for(const p of PROD_MAP){ for(const w of p.words){ if(new RegExp('\\b'+w.replace(/[-]/g,'[- ]?')+'\\b').test(t)){prod=p.key;break;} } if(prod) break; }
+  if(qty) qtyEl.value=qty;
+  if(prod) productSel.value=prod;
+  renderSizes();
+  if(prod&&SIZE_MAP[prod]){
+    Object.keys(SZ_WORDS).sort((a,b)=>b.length-a.length).forEach(sw=>{
+      const can=SZ_WORDS[sw]; if(!SIZE_MAP[prod].includes(can)) return;
+      const m=t.match(new RegExp('\\b'+sw+'\\b','g')); if(m) sizeCounts[can]=(sizeCounts[can]||0)+m.length;
+    });
+    renderSizes();
+  }
+  recalcPrice(); showToast('Got it — check the form ✓');
+}
+
+/* ── SIZES — PLUS / MINUS ── */
+function renderSizes(){
+  const prod=productSel.value, sizes=SIZE_MAP[prod];
+  if(!sizes){sizesWrap.style.display='none';sizeGrid.innerHTML='';return;}
+  sizesWrap.style.display='block';
+  sizeGrid.innerHTML=sizes.map(s=>{
+    const c=sizeCounts[s]||0;
+    return `<div class="size-row${c>0?' has-count':''}" id="srow-${s}">
+      <div class="size-name">${s}</div>
+      <div class="size-controls">
+        <button class="sz-btn minus" data-s="${s}" data-a="minus" aria-label="Remove ${s}">−</button>
+        <div class="sz-count${c===0?' zero':''}" id="sc-${s}">${c}</div>
+        <button class="sz-btn plus" data-s="${s}" data-a="plus" aria-label="Add ${s}">+</button>
+      </div>
+    </div>`;
+  }).join('');
+  sizeGrid.querySelectorAll('.sz-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const s=btn.dataset.s, a=btn.dataset.a;
+      if(a==='plus') sizeCounts[s]=(sizeCounts[s]||0)+1;
+      else if(sizeCounts[s]>0){ sizeCounts[s]--; if(!sizeCounts[s]) delete sizeCounts[s]; }
+      const c=sizeCounts[s]||0;
+      const row=$('srow-'+s), cnt=$('sc-'+s);
+      row.classList.toggle('has-count',c>0);
+      cnt.textContent=c; cnt.classList.toggle('zero',c===0);
+      recalcPrice();
+    });
+  });
+}
+
+/* ── PRICING ── */
+function getUnit(prod,qty){ const t=PRICING[prod]; if(!t||!qty) return 0; const s=[...t].sort((a,b)=>b.min-a.min); for(const x of s) if(qty>=x.min) return x.p; return s[s.length-1].p; }
+function isRush(){ if(!dueDateEl.value) return false; const d=new Date(dueDateEl.value),n=new Date(); n.setHours(0,0,0,0); return Math.ceil((d-n)/864e5)>=0&&Math.ceil((d-n)/864e5)<=RUSH_DAYS; }
+function specialOffer(){return $('specialTier').value==='12'?{min:12,base:21}:{min:24,base:18};}
+function calculateQuote(prod,qty,sizes,special,rush,offer={min:24,base:18}){
+ const factor=rush?1+RUSH_MARKUP:1;
+ if(!special){const unit=getUnit(prod,qty)*factor;return {unit,total:unit*qty,error:''};}
+ if(prod!=='shirts')return {error:'The business special is for T-shirts only.'};
+ if(!Number.isInteger(qty)||qty<offer.min)return {error:'This business special requires at least '+offer.min+' shirts.'};
+ const rates={S:offer.base,M:offer.base,L:offer.base,XL:offer.base,'2XL':offer.base+2,'3XL':offer.base+4};
+ let sum=0,total=0;
+ for(const [size,count] of Object.entries(sizes)){if(!count)continue;if(!(size in rates))return {error:'Special sizes are S–3XL. Turn the special off for other sizes.'};sum+=count;total+=rates[size]*count;}
+ if(sum>qty)return {error:'Size counts exceed quantity. Increase quantity or remove extra sizes.'};
+ const pending=qty-sum;total+=pending*offer.base;
+ total*=factor;return {unit:total/qty,total,error:'',pending,warning:pending?pending+' shirts temporarily priced at S–XL. Finish the size breakdown before saving or taking payment.':''};
+}
+function recalcPrice(){
+ const prod=productSel.value,qty=Number(qtyEl.value)||0,special=$('businessSpecial').checked,rush=isRush();
+ const q=calculateQuote(prod,qty,sizeCounts,special,rush,specialOffer());
+ $('specialStatus').textContent=special?(q.error||'ON — '+specialOffer().min+'+ Business Special: one color, front & back. S–XL $'+specialOffer().base+' / 2XL $'+(specialOffer().base+2)+' / 3XL $'+(specialOffer().base+4)+'.'+(rush?' Existing rush charge also applies.':'')+(q.warning?' '+q.warning:'')):'OFF — Regular pricing applies.';
+ unitPriceEl.textContent=q.error?'—':('$'+q.unit.toFixed(2)+(special?' avg.':''));
+ totalPriceEl.textContent=q.error?'—':'$'+q.total.toFixed(2);
+ rushFlag.classList.toggle('hidden',!rush);
+ $('saveOrder').disabled=!!(q.error||q.pending);
+ updatePayLinks(q.error?0:q.total);
+ for(const id of ['payVenmo','payPaypal','payCashapp']){const a=$(id);a.setAttribute('aria-disabled',String(!!(q.error||q.pending)));if(q.error||q.pending)a.removeAttribute('href');a.style.pointerEvents=(q.error||q.pending)?'none':'';a.style.opacity=(q.error||q.pending)?'.45':'';}
+}
+$('specialTier').onchange=()=>{if($('businessSpecial').checked)qtyEl.value=Math.max(specialOffer().min,Object.values(sizeCounts).reduce((a,b)=>a+b,0));recalcPrice()};
+$('businessSpecial').onchange=()=>{if($('businessSpecial').checked){if(productSel.value!=='shirts'){productSel.value='shirts';sizeCounts={};renderSizes()}if((Number(qtyEl.value)||0)<specialOffer().min)qtyEl.value=specialOffer().min;}recalcPrice()};
+productSel.addEventListener('change',()=>{sizeCounts={};renderSizes();recalcPrice();});
+qtyEl.addEventListener('input',recalcPrice);
+dueDateEl.addEventListener('change',recalcPrice);
+
+/* ── PAYMENT LINKS ── */
+function updatePayLinks(total){
+  const amt=total.toFixed(2), note=encodeURIComponent('Seymore Green order - '+(productSel.value||'items'));
+  $('payVenmo').href=`https://venmo.com/${encodeURIComponent(handles.venmo)}?txn=pay&amount=${amt}&note=${note}`;
+  const pp=handles.paypal.includes('@')?handles.paypal.split('@')[0]:handles.paypal;
+  $('payPaypal').href=`https://paypal.me/${encodeURIComponent(pp)}/${amt}`;
+  $('payCashapp').href=`https://cash.app/$${encodeURIComponent(handles.cashapp)}/${amt}`;
+  $('venmoHandle').textContent='@'+handles.venmo;
+  $('paypalHandle').textContent=handles.paypal;
+  $('cashappHandle').textContent='$'+handles.cashapp;
+}
+
+/* ── ORDERS ── */
+function saveOrder(){
+  const prod=productSel.value, qty=parseInt(qtyEl.value)||0;
+  if(!prod||!qty){showToast('Need product + quantity',true);return;}
+  const rush=isRush(),special=$('businessSpecial').checked,q=calculateQuote(prod,Number(qtyEl.value),sizeCounts,special,rush,specialOffer());
+  if(q.error||q.pending){showToast(q.error||q.warning,true);return;}
+  const fu=q.unit,total=q.total;
+  const order={id:Date.now(),date:new Date().toISOString(),customer:$('custName').value||'—',
+    phone:$('custPhone').value||'',email:$('custEmail').value||'',
+    product:prod,qty,sizes:{...sizeCounts},dueDate:dueDateEl.value||'',
+    pricingMode:special?specialOffer().min+'+ Business Special — one color, front & back':'Regular',specialRates:special?{S:specialOffer().base,M:specialOffer().base,L:specialOffer().base,XL:specialOffer().base,'2XL':specialOffer().base+2,'3XL':specialOffer().base+4}:null,
+    rush,unit:fu,total,payStatus:$('payStatus').value,notes:(special?'BUSINESS SPECIAL: '+specialOffer().min+'+ T-shirts, one-color front & back; S–XL $'+specialOffer().base+', 2XL $'+(specialOffer().base+2)+', 3XL $'+(specialOffer().base+4)+'. ':'')+($('notes').value||'')};
+  orders.unshift(order); persist(); renderOrders();
+  syncSheets(order);
+  if(order.email&&confirm('Send receipt to '+order.email+'?')) emailReceipt(order);
+  showToast('Order saved ✓');
+}
+function persist(){ localStorage.setItem('v2p_orders',JSON.stringify(orders)); $('chipOrders').textContent=orders.length+' Orders Logged'; }
+
+function renderOrders(){
+  const cards=$('orderCards'), body=$('ordersBody'), empty=$('emptyState'), tbl=$('ordersTbl');
+  if(!orders.length){cards.innerHTML='';body.innerHTML='';empty.style.display='block';tbl.style.display='none';return;}
+  empty.style.display='none'; tbl.style.display='table';
+  // Mobile cards
+  cards.innerHTML=orders.map(o=>{
+    const d=new Date(o.date);
+    const ds=(d.getMonth()+1)+'/'+d.getDate()+' · '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const sz=Object.keys(o.sizes||{}).length?Object.entries(o.sizes).map(([s,c])=>`${s}×${c}`).join(' '):'—';
+    return `<div class="order-card${o.payStatus==='paid'?' is-paid':''}">
+      <div class="ocard-top">
+        <div><div class="ocard-name">${escH(o.customer)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${o.product} · qty ${o.qty}${o.rush?' · <span class="badge rush">RUSH</span>':''}</div></div>
+        <div class="ocard-total">$${o.total.toFixed(2)}</div>
+      </div>
+      <div class="ocard-meta">${ds}${o.dueDate?' · Due '+o.dueDate:''}<br>Sizes: ${sz}${o.notes?' · '+escH(o.notes.substring(0,50)):''}</div>
+      <div class="ocard-actions">
+        <span class="badge ${o.payStatus}" style="padding:5px 10px;font-size:10px">${o.payStatus.toUpperCase()}</span>
+        <button class="icon-btn" onclick="togglePaid(${o.id})">${o.payStatus==='paid'?'Mark Unpaid':'Mark Paid'}</button>
+        <button class="icon-btn danger" onclick="delOrder(${o.id})">✕ Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  // Desktop table
+  body.innerHTML=orders.map(o=>{
+    const d=new Date(o.date), ds=(d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const sz=Object.keys(o.sizes||{}).length?' <span style="color:var(--muted);font-size:10px">('+Object.entries(o.sizes).map(([s,c])=>`${s}×${c}`).join(' ')+')</span>':'';
+    return `<tr><td style="white-space:nowrap">${ds}</td><td>${escH(o.customer)}</td>
+      <td>${o.product}${sz}${o.rush?' <span class="badge rush">Rush</span>':''}</td>
+      <td>${o.qty}</td><td>$${o.total.toFixed(2)}</td>
+      <td><span class="badge ${o.payStatus}">${o.payStatus}</span></td>
+      <td style="display:flex;gap:5px">
+        <button class="icon-btn" onclick="togglePaid(${o.id})">${o.payStatus==='paid'?'Unpaid':'Paid'}</button>
+        <button class="icon-btn danger" onclick="delOrder(${o.id})">✕</button>
+      </td></tr>`;
+  }).join('');
+}
+function togglePaid(id){ const o=orders.find(x=>x.id===id); if(!o) return; o.payStatus=o.payStatus==='paid'?'unpaid':'paid'; persist(); renderOrders(); }
+function delOrder(id){ if(!confirm('Delete this order?')) return; orders=orders.filter(o=>o.id!==id); persist(); renderOrders(); }
+function escH(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+$('saveOrder').addEventListener('click',saveOrder);
+$('clearForm').addEventListener('click',()=>{
+  ['custName','custPhone','custEmail','qty','notes'].forEach(id=>$(id).value='');
+  $('businessSpecial').checked=false;productSel.value=''; dueDateEl.value=''; $('payStatus').value='unpaid';
+  sizeCounts={}; renderSizes(); recalcPrice();
+  transcript.textContent='Waiting for your voice…'; transcript.classList.add('empty');
+});
+$('clearAll').addEventListener('click',()=>{ if(!confirm('Clear ALL orders?')) return; orders=[]; persist(); renderOrders(); });
+$('exportCsv').addEventListener('click',()=>{
+  if(!orders.length){showToast('No orders');return;}
+  const hdrs=['Date','Customer','Phone','Product','Qty','Sizes','Due','Rush','UnitPrice','Total','PayStatus','Notes'];
+  const rows=orders.map(o=>[o.date,o.customer,o.phone,o.product,o.qty,Object.entries(o.sizes).map(([s,c])=>`${s}x${c}`).join(' '),o.dueDate,o.rush?'Yes':'No',o.unit.toFixed(2),o.total.toFixed(2),o.payStatus,(o.notes||'').replace(/"/g,'""')]);
+  dl('v2p-orders.csv',[hdrs,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),'text/csv');
+});
+$('exportJson').addEventListener('click',()=>{ if(!orders.length){showToast('No orders');return;} dl('v2p-orders.json',JSON.stringify(orders,null,2),'application/json'); });
+function dl(name,content,type){ const b=new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement('a'); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u); }
+
+/* ── PAYMENT HANDLES ── */
+$('setVenmo').value=handles.venmo; $('setPaypal').value=handles.paypal; $('setCashapp').value=handles.cashapp;
+$('saveHandles').addEventListener('click',()=>{
+  handles.venmo=$('setVenmo').value.trim()||'Seymoregreen';
+  handles.paypal=$('setPaypal').value.trim()||'sales@seymoregreen.com';
+  handles.cashapp=$('setCashapp').value.trim()||'SeymoreGreen';
+  localStorage.setItem('v2p_handles',JSON.stringify(handles)); recalcPrice(); showToast('Handles saved ✓');
+});
+
+/* ── SETTINGS MODAL ── */
+$('setWebhook').value=settings.webhook; $('setVenmoModal').value=handles.venmo;
+$('setPaypalModal').value=handles.paypal; $('setCashappModal').value=handles.cashapp;
+$('setBizName').value=settings.bizName; $('setBizEmail').value=settings.bizEmail;
+updateSyncChip();
+function updateSyncChip(){ const c=$('chipSync'); if(settings.webhook){c.textContent='● Sheets On';c.classList.add('on');}else{c.textContent='● Sheets Off';c.classList.remove('on');} }
+$('openSettings').addEventListener('click',()=>$('settingsModal').classList.add('show'));
+$('closeSettings').addEventListener('click',()=>$('settingsModal').classList.remove('show'));
+$('settingsModal').addEventListener('click',e=>{ if(e.target.id==='settingsModal') $('settingsModal').classList.remove('show'); });
+$('saveWebhook').addEventListener('click',()=>{
+  settings.webhook=$('setWebhook').value.trim();
+  localStorage.setItem('v2p_settings',JSON.stringify(settings));
+  const s=$('webhookStatus');
+  if(settings.webhook){s.className='sync-status ok';s.textContent='✓ URL saved — ready to sync';}
+  else{s.className='sync-status idle';s.textContent='Not connected';}
+  updateSyncChip(); showToast('Webhook saved ✓');
+});
+$('testWebhook').addEventListener('click',async()=>{
+  const url=$('setWebhook').value.trim(), s=$('webhookStatus');
+  if(!url){s.className='sync-status err';s.textContent='Paste a URL first';return;}
+  s.className='sync-status idle'; s.textContent='Testing…';
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({test:true,source:'Voice to Pocket',timestamp:new Date().toISOString()})});
+    s.className='sync-status ok'; s.textContent='✓ Sent — check your Sheet';
+  }catch(err){s.className='sync-status err';s.textContent='✗ '+err.message;}
+});
+$('saveAllSettings').addEventListener('click',()=>{
+  settings.webhook=$('setWebhook').value.trim();
+  settings.bizName=$('setBizName').value.trim()||'Seymore Green';
+  settings.bizEmail=$('setBizEmail').value.trim()||'sales@seymoregreen.com';
+  handles.venmo=$('setVenmoModal').value.trim()||'Seymoregreen';
+  handles.paypal=$('setPaypalModal').value.trim()||'sales@seymoregreen.com';
+  handles.cashapp=$('setCashappModal').value.trim()||'SeymoreGreen';
+  localStorage.setItem('v2p_settings',JSON.stringify(settings));
+  localStorage.setItem('v2p_handles',JSON.stringify(handles));
+  $('setVenmo').value=handles.venmo; $('setPaypal').value=handles.paypal; $('setCashapp').value=handles.cashapp;
+  recalcPrice(); updateSyncChip(); $('settingsModal').classList.remove('show');
+  showToast('All settings saved ✓');
+});
+
+/* ── SYNC + RECEIPT ── */
+async function syncSheets(order){
+  if(!settings.webhook) return;
+  try{ await fetch(settings.webhook,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)}); }
+  catch(e){ console.warn('Sync failed:',e); }
+}
+function emailReceipt(order){
+  if(!order.email) return;
+  const sub=encodeURIComponent(`${settings.bizName} — Order Receipt #${order.id}`);
+  const sz=Object.keys(order.sizes||{}).length?'Sizes: '+Object.entries(order.sizes).map(([s,c])=>`${s} x${c}`).join(', ')+'\n':'';
+  const body=encodeURIComponent(`Thanks for your order with ${settings.bizName}!\n\nOrder #: ${order.id}\nCustomer: ${order.customer}\nProduct: ${order.product}\nQuantity: ${order.qty}\n${sz}${order.specialRates?'Average Unit Price':'Unit Price'}: $${order.unit.toFixed(2)}${order.rush?' (Rush +25%)':''}\nOrder Total: $${order.total.toFixed(2)}\nDue Date: ${order.dueDate||'TBD'}\nPayment Status: ${order.payStatus.toUpperCase()}\n\nNotes: ${order.notes||'(none)'}\n\n— ${settings.bizName}\n${settings.bizEmail}\n21 Years Self-Employed. If you can think it, we can print it.`);
+  window.open(`mailto:${order.email}?subject=${sub}&body=${body}`,'_blank');
+}
+
+/* ── TOAST ── */
+function showToast(msg,err){
+  const t=$('toast'); t.textContent=msg;
+  t.style.background=err?'var(--red)':'var(--green)'; t.style.color=err?'#fff':'#000';
+  t.classList.add('show'); clearTimeout(showToast._t);
+  showToast._t=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+
+/* CONTACT BOOK — independent local persistence; never sends mail automatically. */
+const CONTACT_KEY='v2p_contacts_v1';let editingContact=null;
+function contacts(){try{const v=JSON.parse(localStorage.getItem(CONTACT_KEY)||'[]');return Array.isArray(v)?v:[]}catch{return []}}
+function contactFields(){return {name:$('contactName').value.trim(),phone:$('contactPhone').value.trim(),email:$('contactEmail').value.trim(),notes:$('contactNotes').value.trim(),company:$('contactCompany').value.trim(),website:$('contactWebsite').value.trim(),address:$('contactAddress').value.trim()}}
+function persistContacts(rows){try{localStorage.setItem(CONTACT_KEY,JSON.stringify(rows));renderContacts();return true}catch(e){$('contactStatus').textContent='Could not save: device storage unavailable or full.';return false}}
+function clearContact(){editingContact=null;hideContactFollowup();['contactName','contactPhone','contactEmail','contactNotes','contactCompany','contactWebsite','contactAddress','contactTranscript'].forEach(id=>$(id).value='');$('contactStatus').textContent='New contact — speak or type the details.'}
+function extractContact(text){
+ const labels=/\b(?:phone(?: number)?|telephone|mobile|email|e-mail|notes?)\b\s*[:,-]?/ig;
+ const marks=[...text.matchAll(labels)];
+ const name=text.slice(0,marks[0]?.index??text.length).replace(/^(?:(?:new|add)\s+)?contact[\s.:,-]*/i,'').replace(/^(?:name(?: is)?|customer(?: name)?)[\s:,-]*/i,'').trim().replace(/[.,;]+$/,'');
+ if(name)$('contactName').value=name;
+ marks.forEach((m,i)=>{let v=text.slice(m.index+m[0].length,marks[i+1]?.index??text.length).trim().replace(/^[\s:,-]+|[\s,;]+$/g,'');
+ if(/mail/i.test(m[0])){v=v.toLowerCase().replace(/\s+at\s+/g,'@').replace(/\s+dot\s+/g,'.').replace(/\s+(?:dash|hyphen)\s+/g,'-').replace(/\s+underscore\s+/g,'_').replace(/\s+/g,'').replace(/[.,;]+$/,'');$('contactEmail').value=v}
+ else if(/note/i.test(m[0]))$('contactNotes').value=v;
+ else {const digits={zero:'0',oh:'0',one:'1',two:'2',three:'3',four:'4',five:'5',six:'6',seven:'7',eight:'8',nine:'9'};v=v.toLowerCase().replace(/\b(zero|oh|one|two|three|four|five|six|seven|eight|nine)\b/g,w=>digits[w]);$('contactPhone').value=v.replace(/[^\d+() .x-]/g,'').replace(/[.\s]+$/,'')}
+ });$('contactStatus').textContent='Details extracted. Check the name, every digit, and email spelling; then save.';
+}
+function useContact(c){$('custName').value=c.name;$('custPhone').value=c.phone;$('custEmail').value=c.email;setCaptureMode('order');$('custName').scrollIntoView({behavior:'smooth',block:'center'});showToast('Contact added to order — dictate the items');}
+function composeContact(c){if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)){showToast('Check the email address first',true);return}location.href='mailto:'+encodeURIComponent(c.email)+'?subject='+encodeURIComponent(settings.bizName+' — Following up')+'&body='+encodeURIComponent('Hi '+(c.name||'there')+',\n\nGreat speaking with you! Let me know what you need, and we can get your order started.\n\n'+settings.bizName+'\n'+settings.bizEmail);}
+function renderContacts(){const list=$('contactList'),q=$('contactSearch').value.toLowerCase();list.replaceChildren();const all=contacts();$('contactCount').textContent=all.length+' saved';all.filter(c=>[c.name,c.phone,c.email,c.company,c.website,c.address,c.notes].join(' ').toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>{const row=document.createElement('div');row.className='voice-note-row';const name=document.createElement('strong');name.textContent=c.name;row.append(name);const detail=document.createElement('p');detail.textContent=[c.phone,c.email,c.company,c.website,c.address,c.notes].filter(Boolean).join(' · ');row.append(detail);const bar=document.createElement('div');bar.className='btn-row';const action=(title,fn)=>{const b=document.createElement('button');b.className='btn btn-ghost';b.textContent=title;b.onclick=fn;bar.append(b)};
+ if(c.phone){for(const [title,scheme] of [['Call','tel:'],['Text','sms:']]){const a=document.createElement('a');a.className='btn btn-ghost';a.textContent=title;a.href=scheme+c.phone.replace(/[^\d+]/g,'');bar.append(a)}}if(c.email)action('Email',()=>composeContact(c));action('Order',()=>useContact(c));action('Edit',()=>{editingContact=c.id;for(const [field,key] of [['contactName','name'],['contactPhone','phone'],['contactEmail','email'],['contactNotes','notes'],['contactCompany','company'],['contactWebsite','website'],['contactAddress','address']])$(field).value=c[key]||'';$('contactTranscript').value='';$('contactName').focus();$('contactsPanel').scrollIntoView({behavior:'smooth'});showContactFollowup(c);$('contactStatus').textContent='Editing '+c.name});action('Delete',()=>{if(confirm('Delete '+c.name+'?')){if(persistContacts(contacts().filter(x=>x.id!==c.id))&&editingContact===c.id)clearContact()}});row.append(bar);list.append(row)});if(!list.children.length)list.textContent=q?'No matching contacts.':'No contacts yet. Tap Dictate Contact to begin.';}
+$('contactMic').onclick=()=>{setCaptureMode('contact');if(!isListening)startListening();$('contactStatus').textContent='Speak the name, phone, and email. Tap STOP when finished.'};
+$('contactNew').onclick=clearContact;$('contactExtract').onclick=()=>extractContact($('contactTranscript').value);
+$('contactSave').onclick=()=>{const c=contactFields();if(!c.name){showToast('Add a name first',true);return}if(c.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)){showToast('Check the email spelling',true);return}if(c.phone&&(c.phone.replace(/\D/g,'').length<7||c.phone.replace(/\D/g,'').length>15)){showToast('Check the complete phone number',true);return}const all=contacts();const duplicate=all.find(x=>x.id!==editingContact&&((c.email&&x.email.toLowerCase()===c.email.toLowerCase())||(c.phone&&x.phone.replace(/\D/g,'')===c.phone.replace(/\D/g,''))));if(duplicate){$('contactStatus').textContent='This phone or email belongs to '+duplicate.name+'. Edit that contact or correct the details.';return}c.id=editingContact||String(Date.now())+Math.random();const i=all.findIndex(x=>x.id===c.id);if(i>=0)all[i]=c;else all.push(c);if(persistContacts(all)){editingContact=c.id;$('contactStatus').textContent='Saved '+c.name+' on this device.';showContactFollowup(c);showToast('Contact saved ✓')}};
+$('contactUse').onclick=()=>useContact(contactFields());$('contactEmailNow').onclick=()=>composeContact(contactFields());$('contactSearch').oninput=renderContacts;
+
+function contactsCsv(rows){
+ const columns=[['Name','name'],['Phone','phone'],['Email','email'],['Company','company'],['Website','website'],['Address','address'],['Notes','notes']];
+ const cell=value=>{let text=String(value??'');if(/^[\s\u0000-\u001f]*[=+@-]/.test(text))text="'"+text;return '"'+text.replace(/"/g,'""')+'"'};
+ return '\uFEFF'+[columns.map(c=>cell(c[0])).join(','),...rows.map(row=>columns.map(c=>cell(row[c[1]])).join(','))].join('\r\n');
+}
+$('contactExportCsv').onclick=()=>{const rows=contacts();if(!rows.length){showToast('No contacts to export yet',true);return}const u=URL.createObjectURL(new Blob([contactsCsv(rows)],{type:'text/csv;charset=utf-8;'})),a=document.createElement('a');a.href=u;a.download='voice-to-pocket-contacts-'+new Date().toISOString().slice(0,10)+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);$('contactStatus').textContent='Exported '+rows.length+' contacts to CSV.'};
+
+$('contactExport').onclick=()=>{const blob=new Blob([JSON.stringify({version:1,contacts:contacts()},null,2)],{type:'application/json'});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='voice-to-pocket-contacts-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+$('contactImport').onclick=()=>$('contactImportFile').click();$('contactImportFile').onchange=async e=>{try{const f=e.target.files[0];if(!f)return;if(f.size>5000000)throw Error('Backup too large');const data=JSON.parse(await f.text());if(!Array.isArray(data.contacts))throw Error('Choose a Voice to Pocket contact backup');const all=contacts();let added=0;for(const raw of data.contacts){if(!raw||typeof raw.name!=='string'||!raw.name.trim())throw Error('Invalid contact in backup');const c={};for(const k of ['name','phone','email','notes','company','website','address'])c[k]=typeof raw[k]==='string'?raw[k]:'';if(all.some(x=>(c.email&&x.email.toLowerCase()===c.email.toLowerCase())||(c.phone&&x.phone.replace(/\D/g,'')===c.phone.replace(/\D/g,''))||(!c.email&&!c.phone&&x.name===c.name)))continue;c.id=String(Date.now())+Math.random();all.push(c);added++}if(persistContacts(all))$('contactStatus').textContent='Imported '+added+' contacts. Existing entries kept.'}catch(err){$('contactStatus').textContent='Import failed: '+err.message}finally{e.target.value=''}};renderContacts();
+
+
+/* BUSINESS CARD READER: OCR runs locally in a worker; card photos are not uploaded. */
+let cardReaderLoading=null,cardWorker=null,cardImage=null,cardAngle=0,cardRun=0,cardBusy=false;
+function loadCardReader(){
+ if(window.Tesseract)return Promise.resolve(window.Tesseract);
+ if(cardReaderLoading)return cardReaderLoading;
+ cardReaderLoading=new Promise((resolve,reject)=>{const tag=document.createElement('script');tag.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';let finished=false;const timer=setTimeout(()=>fail(),30000);const fail=()=>{if(finished)return;finished=true;clearTimeout(timer);tag.remove();cardReaderLoading=null;reject(Error('Could not load the card reader. Check your connection and try again.'))};tag.onload=()=>{if(finished)return;finished=true;clearTimeout(timer);if(window.Tesseract)resolve(window.Tesseract);else{cardReaderLoading=null;reject(Error('Card reader did not load. Please retry.'))}};tag.onerror=fail;document.head.append(tag)});return cardReaderLoading;
+}
+function cardBusyState(busy){cardBusy=busy;for(const id of ['scanBusinessCard','businessCardRotate','businessCardApply','contactSave'])$(id).disabled=busy;$('businessCardCancel').disabled=!busy;}
+function extractBusinessCard(text){
+ const lines=text.split(/\r?\n/).map(l=>l.replace(/[|]/g,' ').replace(/\s+/g,' ').trim()).filter(Boolean);
+ const emailMatch=text.match(/[A-Z0-9.!#$%&'*+\/=?^_`{|}~-]+\s*@\s*[A-Z0-9-]+(?:\s*\.\s*[A-Z0-9-]+)+/i),email=emailMatch?emailMatch[0].replace(/\s/g,'').replace(/[.,;]+$/,''):'';
+ const candidates=[];for(const line of lines){for(const m of line.matchAll(/(?:\+\d{1,3}[ .-]?)?(?:\(\d{3}\)|\b\d{3})[ .-]?\d{3}[ .-]?\d{4}(?:\s*(?:ext\.?|x)\s*\d+)?\b/gi)){const digits=m[0].replace(/\D/g,'');if(digits.length>=10)candidates.push({value:m[0].trim(),fax:/\bfax\b/i.test(line),mobile:/\b(?:mobile|cell|direct)\b/i.test(line)})}}
+ candidates.sort((a,b)=>Number(a.fax)-Number(b.fax)||Number(b.mobile)-Number(a.mobile));const phone=candidates[0]?.value||'';
+ const webMatch=text.replace(emailMatch?.[0]||'','').match(/(?:https?:\/\/|www\.)[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/[a-z0-9_~:/?#\[\]@!$&'()*+,;=%.\-]*)?|\b[a-z0-9-]+\.(?:com|org|net|co|io|biz|us|edu)(?:\/[a-z0-9_~:/?#\[\]@!$&'()*+,;=%.\-]*)?/i);
+ let website=webMatch?webMatch[0].replace(/[.,;]+$/,''):'';if(website&&!/^https?:/i.test(website))website='https://'+website;
+ const addressLines=lines.filter(l=>/^\d+\s+.+\b(?:street|st\.?|avenue|ave\.?|road|rd\.?|boulevard|blvd\.?|drive|dr\.?|lane|ln\.?|way|court|ct\.?|parkway|pkwy\.?|place|pl\.?)\b/i.test(l)||/\b[A-Z]{2}\s+\d{5}(?:-\d{4})?\b/.test(l)||/^P\.?O\.?\s+Box\b/i.test(l));
+ const isCompany=l=>/\b(?:llc|inc\.?|ltd\.?|company|corp\.?|studio|studios|services|solutions|printing|design|agency|group|shop|cafe|café|restaurant|barber|salon|construction|consulting)\b/i.test(l);
+ const job=l=>/\b(?:owner|founder|manager|director|president|sales|consultant|specialist|designer|ceo|officer|broker|realtor|engineer)\b/i.test(l);
+ const cleanLine=l=>l.replace(/^(?:name|contact|company|business)\s*:\s*/i,'').trim();
+ const eligible=lines.filter(l=>!l.includes('@')&&!/\d/.test(l)&&!/^www\.|https?:\/\//i.test(l)&&!job(l)&&!/^\s*(?:tel|phone|email|fax|website|mobile)\s*:/i.test(l));
+ const explicitName=lines.find(l=>/^name\s*:/i.test(l));const nameLine=explicitName||eligible.find(l=>!isCompany(l)&&/^[\p{L}][\p{L} .,'’\-]+$/u.test(l)&&l.split(/\s+/).length>=2&&l.split(/\s+/).length<=4)||'';
+ const explicitCompany=lines.find(l=>/^(?:company|business)\s*:/i.test(l));const company=explicitCompany||eligible.find(l=>l!==nameLine&&isCompany(l))||eligible.find(l=>l!==nameLine)||'';
+ const used=new Set([nameLine,company,...addressLines]);const remaining=lines.filter(l=>!used.has(l));
+ return {name:cleanLine(nameLine),phone,email,company:cleanLine(company),website,address:addressLines.join('\n'),notes:remaining.length?'From business card:\n'+remaining.join('\n'):''};
+}
+function applyBusinessCard(text){const c=extractBusinessCard(text);clearContact();setCaptureMode('contact');for(const [field,key] of [['contactName','name'],['contactPhone','phone'],['contactEmail','email'],['contactCompany','company'],['contactWebsite','website'],['contactAddress','address'],['contactNotes','notes']])$(field).value=c[key]||'';$('contactBusinessDetails').open=!!(c.company||c.website||c.address);$('contactStatus').textContent='Card details filled in. Check the name, every phone digit and email spelling, then tap Save Contact.';$('businessCardStatus').textContent=c.name?'Details filled below — review and save.':'Card text read. Add or correct the person’s name below before saving.';}
+async function readBusinessCard(){
+ if(!cardImage||cardBusy)return;const run=++cardRun;cardBusyState(true);$('businessCardStatus').textContent='Loading card reader… keep this page open.';let worker=null;
+ try{const engine=await loadCardReader();if(run!==cardRun)return;worker=await engine.createWorker('eng',1,{logger:m=>{if(run===cardRun)$('businessCardStatus').textContent=(m.status==='recognizing text'?'Reading business card':m.status)+(typeof m.progress==='number'?' '+Math.round(m.progress*100)+'%':'')}});if(run!==cardRun){await worker.terminate();return}cardWorker=worker;
+ const canvas=document.createElement('canvas'),w=cardImage.naturalWidth,h=cardImage.naturalHeight,scale=Math.min(2,2400/Math.max(w,h));const rotated=cardAngle%180!==0;canvas.width=Math.round((rotated?h:w)*scale);canvas.height=Math.round((rotated?w:h)*scale);const context=canvas.getContext('2d');context.fillStyle='white';context.fillRect(0,0,canvas.width,canvas.height);context.translate(canvas.width/2,canvas.height/2);context.rotate(cardAngle*Math.PI/180);context.drawImage(cardImage,-w*scale/2,-h*scale/2,w*scale,h*scale);$('businessCardPreview').src=canvas.toDataURL('image/jpeg',.88);$('businessCardPreview').style.display='block';await worker.setParameters({tessedit_pageseg_mode:'11'});const result=await worker.recognize(canvas);
+ if(run!==cardRun)return;const text=result.data.text.trim();$('businessCardText').value=text;if(!text)throw Error('No readable words found. Retake a closer photo in good light.');applyBusinessCard(text);if(result.data.confidence<60)$('businessCardStatus').textContent='Some words may be unclear. Review every field, or retake a sharper photo.';
+ }catch(e){if(run===cardRun)$('businessCardStatus').textContent='Could not read this card: '+e.message+' Your saved contacts are unchanged.'}
+ finally{if(worker)await worker.terminate().catch(()=>{});if(cardWorker===worker)cardWorker=null;if(run===cardRun)cardBusyState(false)}
+}
+function cancelBusinessCard(){++cardRun;if(cardWorker){cardWorker.terminate().catch(()=>{});cardWorker=null}cardBusyState(false);$('businessCardStatus').textContent='Reading cancelled. Your saved contacts are unchanged.';}
+$('scanBusinessCard').onclick=()=>{if(Object.values(contactFields()).some(Boolean)&&!confirm('Start a new contact from a business card? Unsaved details in the form will be replaced after a successful scan.'))return;$('businessCardFile').value='';$('businessCardFile').click()};
+$('businessCardFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(!file.type.startsWith('image/')||file.size>20000000)throw Error('Choose a card photo under 20 MB.');$('businessCardPanel').hidden=false;$('businessCardStatus').textContent='Opening photo…';const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();if(!img.naturalWidth)throw Error('Photo could not be opened.');cardImage=img;cardAngle=0;await readBusinessCard()}finally{URL.revokeObjectURL(url)}}catch(err){$('businessCardPanel').hidden=false;$('businessCardStatus').textContent=err.message+' Try a JPG or PNG photo.'}};
+$('businessCardRotate').onclick=()=>{cardAngle=(cardAngle+90)%360;readBusinessCard()};$('businessCardCancel').onclick=cancelBusinessCard;
+$('businessCardClose').onclick=()=>{if(cardBusy)cancelBusinessCard();$('businessCardPanel').hidden=true;$('businessCardPreview').removeAttribute('src');$('businessCardPreview').style.display='none';cardImage=null;};
+$('businessCardApply').onclick=()=>{if(!$('businessCardText').value.trim())return;if(Object.values(contactFields()).some(Boolean)&&!confirm('Replace the current contact draft with these card details?'))return;applyBusinessCard($('businessCardText').value)};
+
+
+/* FAST FOLLOW-UP: save locally, then open a draft by an explicit tap. */
+let followupContact=null;
+function hideContactFollowup(){followupContact=null;document.getElementById('contactFollowup').hidden=true;}
+function showContactFollowup(c){followupContact={...c};$('contactFollowupName').textContent='Saved: '+c.name;$('contactIntroMessage').value='Hi '+(c.name.split(/\s+/)[0]||'there')+', this is Gary with Seymore Green. It was nice meeting you! I look forward to doing business with you. Let me know how I can help.';$('contactAutoText').disabled=!c.phone;$('contactAutoEmail').disabled=!c.email;$('contactFollowup').hidden=false;}
+function saveCompleteContact(){
+ const c=contactFields(),digits=c.phone.replace(/\D/g,'');
+ if(!c.name||(!c.phone&&!c.email)||(c.phone&&(digits.length<10||digits.length>15))||(c.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email))){$('contactStatus').textContent='Not auto-saved yet. Check the name and complete phone number or email, then tap Save Contact.';return false}
+ $('contactSave').onclick();return !!followupContact&&followupContact.name===c.name&&followupContact.phone===c.phone&&followupContact.email===c.email;
+}
+try{$('contactAutoSave').checked=localStorage.getItem('v2p_auto_save_contact')!=='off'}catch{$('contactAutoSave').checked=true}
+$('contactAutoSave').onchange=()=>{try{localStorage.setItem('v2p_auto_save_contact',$('contactAutoSave').checked?'on':'off')}catch{}};
+for(const id of ['contactName','contactPhone','contactEmail','contactCompany','contactWebsite','contactAddress','contactNotes'])$(id).addEventListener('input',hideContactFollowup);
+$('contactAutoText').onclick=()=>{if(!followupContact?.phone)return;const phone=followupContact.phone.replace(/[^\d+]/g,'');const separator=/iPad|iPhone|iPod/.test(navigator.userAgent)?'&':'?';location.href='sms:'+phone+separator+'body='+encodeURIComponent($('contactIntroMessage').value);};
+$('contactAutoEmail').onclick=()=>{if(!followupContact?.email)return;location.href='mailto:'+encodeURIComponent(followupContact.email)+'?subject='+encodeURIComponent('Nice meeting you — Seymore Green')+'&body='+encodeURIComponent($('contactIntroMessage').value);};
+
+/* ── INIT ── */
+renderOrders(); recalcPrice();
+$('laneContact').onclick=()=>setCaptureMode('contact');
+$('laneOrder').onclick=()=>setCaptureMode('order');
+$('laneNote').onclick=()=>setCaptureMode('note');
+setCaptureMode('contact');
+// Show Sheets status on load
+const ws=$('webhookStatus');
+if(settings.webhook){ws.className='sync-status ok';ws.textContent='✓ Connected to Google Sheets';}
+else{ws.className='sync-status idle';ws.textContent='Not connected';}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
+
